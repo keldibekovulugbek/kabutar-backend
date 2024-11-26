@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="DbContext\" />
+    <Folder Include="Interfaces\Attachments\" />
+    <Folder Include="Interfaces\Messages\" />
+    <Folder Include="Interfaces\Common\" />
+    <Folder Include="Interfaces\Users\" />
+    <Folder Include="Repositories\Attachments\" />
+    <Folder Include="Repositories\Common\" />
+    <Folder Include="Repositories\Messages\" />
+    <Folder Include="Repositories\Users\" />
+  </ItemGroup>
+
+</Project>
