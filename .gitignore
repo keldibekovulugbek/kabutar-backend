@@ -1,0 +1,76 @@
+
+# Build Folders
+bin/
+obj/
+
+# User-specific files
+.vscode/
+.idea/
+*.user
+*.suo
+
+# Logs
+*.log
+logs/
+log/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE-specific files
+*.vs/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Package Folders
+packages/
+*.nupkg
+
+# Environment files
+.env
+.env.*
+
+# Configuration files
+appsettings.json
+appsettings.*.json
+
+# Database files
+*.bak
+*.sql
+
+# Visual Studio Code files
+.vscode/
+
+# Rider IDE files
+.idea/
+
+# Git specific files
+.git/
+
+# Node.js specific files (if any tools are used)
+node_modules/
+
+# Additional development files
+*.orig
+*.rej
+
+# macOS specific
+*.DS_Store
+
+# Windows specific
+Thumbs.db
+desktop.ini
+
+# Lock files
+*.lock
+*.pid
+
+# Archives
+*.zip
+*.tar.gz
+*.rar
+*.7z
