@@ -1,4 +1,5 @@
-﻿using Kabutar.DataAccess.Interfaces.Users;
+﻿using Kabutar.DataAccess.Context;
+using Kabutar.DataAccess.Interfaces.Users;
 using Kabutar.Domain.Entities.Users;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
@@ -9,7 +10,7 @@ namespace Kabutar.DataAccess.Repositories.Users
     {
         private readonly DbSet<User> _users;
 
-        public UserRepository(DbContext context) : base(context)
+        public UserRepository(AppDbContext context) : base(context)
         {
             _users = context.Set<User>();
         }

@@ -71,7 +71,7 @@ namespace Kabutar.Service.Services.Accounts;
             var hashResult = PasswordHasher.Hash(accountCreate.Password);
             newUser.PasswordSalt = hashResult.Salt;
             newUser.PasswordHash = hashResult.Hash;
-            newUser.ProfilePicture = $"{_fileService.ImageFolderName}/IMG_bf6218f9-dd17-44ce-8d39-e9b9d374a903.jpg";
+            newUser.ProfilePicture = $"{_fileService.ImageFolderName}/default.jpg";
             newUser.Created = TimeHelper.GetCurrentDateTime();
             newUser.Updated = TimeHelper.GetCurrentDateTime();
 

@@ -5,7 +5,7 @@ public static class PasswordHasher
     public static (string Hash, string Salt) Hash(string password)
     {
        var salt = GenerateSalt();
-        var passwordHash = BCrypt.Net.BCrypt.HashPassword(password, salt);
+       var passwordHash = BCrypt.Net.BCrypt.HashPassword(password + salt);
 
         return (Hash: passwordHash, Salt: salt);
     }
