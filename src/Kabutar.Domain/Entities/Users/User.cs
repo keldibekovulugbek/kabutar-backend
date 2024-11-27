@@ -12,7 +12,9 @@ public class User : Auditable
     public string Username { get; set; } = string.Empty;
 
     public string Email { get; set; } = string.Empty;
-    
+
+    public string ProfilePicture { get; set; } = string.Empty;
+
     public bool IsEmailVerified { get; set; } = false;
 
     public string PasswordHash { get; set; } = string.Empty;

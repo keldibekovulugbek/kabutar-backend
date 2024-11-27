@@ -24,13 +24,15 @@ namespace Kabutar.DataAccess.Repositories.Users
             return await _users.FirstOrDefaultAsync(u => u.Username == username);
         }
 
-        public async Task<bool> UpdatePasswordAsync(long userId, string newPasswordHash)
+        public async Task<bool> UpdatePasswordAsync(long userId, string newPasswordHash, string Salt)
         {
             var user = await _users.FindAsync(userId);
             if (user == null)
                 return false;
 
             user.PasswordHash = newPasswordHash;  // Assume hashing is done outside this method
+            user.PasswordSalt = Salt;
+
             await _context.SaveChangesAsync();
             return true;
         }

@@ -11,19 +11,26 @@
     <Folder Include="DTOs\Attachments\" />
     <Folder Include="DTOs\Common\" />
     <Folder Include="DTOs\Messages\" />
-    <Folder Include="DTOs\Accounts\" />
     <Folder Include="DTOs\Users\" />
     <Folder Include="Interfaces\Accounts\" />
     <Folder Include="Interfaces\Attachments\" />
-    <Folder Include="Interfaces\Common\" />
     <Folder Include="Interfaces\Messages\" />
     <Folder Include="Interfaces\Users\" />
-    <Folder Include="Security\" />
     <Folder Include="Services\Accounts\" />
     <Folder Include="Services\Attachments\" />
     <Folder Include="Services\Common\" />
     <Folder Include="Services\Messages\" />
     <Folder Include="Services\Users\" />
   </ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.0" />
+		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.2.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Kabutar.Domain\Kabutar.Domain.csproj" />
+	</ItemGroup>
 
 </Project>
