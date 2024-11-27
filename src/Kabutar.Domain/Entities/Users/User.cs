@@ -1,4 +1,5 @@
 ﻿using Kabutar.Domain.Common;
+using Kabutar.Domain.Entities.Messages;
 
 namespace Kabutar.Domain.Entities.Users;
 
@@ -21,4 +22,9 @@ public class User : Auditable
     public string About { get; set; } = string.Empty;
 
     public DateTime? LastActive { get; set; }
+
+    public virtual ICollection<Message> SentMessages { get; set; } = new HashSet<Message>();
+
+    public virtual ICollection<Message> ReceivedMessages { get; set; } = new HashSet<Message>();
+
 }
