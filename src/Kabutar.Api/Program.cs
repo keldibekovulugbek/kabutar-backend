@@ -1,28 +1,26 @@
-using Kabutar.Service.Interfaces.Common;
-using Kabutar.Service.Services.Common;
+using Kabutar.Api.Configurations.Dependencies;
+using Kabutar.Api.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddTransient<IFileService, FileService>();
-var app = builder.Build();
+builder.AddDataAccessLayer();
+builder.AddServiceLayer();
+builder.AddApiLayer();
 
-// Configure the HTTP request pipeline.
+//-> Middlewares
+var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseStaticFiles();
+app.UseMiddleware<ExceptionHandlerMiddleware>();
+app.UseCors("AllowAll");
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();

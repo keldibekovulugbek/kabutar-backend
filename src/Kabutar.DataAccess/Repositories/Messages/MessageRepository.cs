@@ -1,5 +1,6 @@
 ﻿
 
+using Kabutar.DataAccess.Context;
 using Kabutar.DataAccess.Interfaces.Messages;
 using Kabutar.Domain.Entities.Messages;
 using Kabutar.Domain.Entities.Users;
@@ -11,7 +12,8 @@ public class MessageRepository : GenericRepository<Message>, IMessageRepository
 {
    private readonly DbSet<Message> messages;
 
-    public MessageRepository(DbContext context) : base(context)
+
+    public MessageRepository(AppDbContext context) : base(context)
     {
         messages = context.Set<Message>();
     }
