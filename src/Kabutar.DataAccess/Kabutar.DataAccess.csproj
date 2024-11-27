@@ -7,15 +7,22 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="DbContext\" />
     <Folder Include="Interfaces\Attachments\" />
-    <Folder Include="Interfaces\Messages\" />
     <Folder Include="Interfaces\Common\" />
-    <Folder Include="Interfaces\Users\" />
     <Folder Include="Repositories\Attachments\" />
     <Folder Include="Repositories\Common\" />
-    <Folder Include="Repositories\Messages\" />
-    <Folder Include="Repositories\Users\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Kabutar.Domain\Kabutar.Domain.csproj" />
   </ItemGroup>
 
 </Project>
