@@ -7,9 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Entities\Messages\" />
     <Folder Include="Entities\Attachments\" />
-    <Folder Include="Entities\Users\" />
     <Folder Include="Enums\" />
   </ItemGroup>
 
