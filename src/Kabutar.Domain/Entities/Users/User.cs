@@ -21,7 +21,7 @@ public class User : Auditable
 
     public string PasswordSalt { get; set; } = string.Empty;
 
-    public string About { get; set; } = string.Empty;
+    public string? About { get; set; } = string.Empty;
 
     public DateTime? LastActive { get; set; }
 

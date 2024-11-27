@@ -15,10 +15,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\Accounts\" />
     <Folder Include="Controllers\Attachments\" />
     <Folder Include="Controllers\Messages\" />
-    <Folder Include="Controllers\Users\" />
   </ItemGroup>
+	<ItemGroup>
+
+		<ProjectReference Include="..\Kabutar.Service\Kabutar.Service.csproj" />
+
+	</ItemGroup>
 
 </Project>
