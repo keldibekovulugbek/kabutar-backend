@@ -7,6 +7,6 @@ namespace Kabutar.DataAccess.Interfaces.Users
     {
         Task<User> GetByEmailAsync(string email);
         Task<User> GetByUsernameAsync(string username);
-        Task<bool> UpdatePasswordAsync(long userId, string newPasswordHash, string Salt);
+        Task<bool> UpdatePasswordAsync(long userId, string newPasswordHash);
     }
 }

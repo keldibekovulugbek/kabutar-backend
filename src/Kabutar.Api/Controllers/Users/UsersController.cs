@@ -33,16 +33,16 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> GetUsernameAsync(string username)
     => Ok(await _userService.GetUsernameAsync(username));
 
-    [HttpPut, ]
+    [HttpPut, Authorize()]
     public async Task<IActionResult> UpdateAsync([FromForm] UserUpdateDTO userUpdateViewModel)
         => Ok(await _userService.UpdateAsync((long)_identityHelperService.GetUserId()!, userUpdateViewModel));
 
     [HttpDelete("{userId}"), Authorize]
-    public async Task<IActionResult> DeleteAsync(long userId)
-        => Ok(await _userService.DeleteAsync(userId));
+    public async Task<IActionResult> DeleteAsync()
+        => Ok(await _userService.DeleteAsync((long)_identityHelperService.GetUserId()!));
 
     [HttpPost("images/upload"), Authorize]
-    public async Task<IActionResult> ImageUpdateAsync(int id, [FromForm] AccountImageUploadDTO dto)
+    public async Task<IActionResult> ImageUpdateAsync([FromForm] AccountImageUploadDTO dto)
         => Ok(await _userService.ImageUpdateAsync((long)_identityHelperService.GetUserId()!, dto));
 
 }

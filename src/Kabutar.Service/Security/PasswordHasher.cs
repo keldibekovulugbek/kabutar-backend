@@ -2,21 +2,15 @@
 
 public static class PasswordHasher
 {
-    public static (string Hash, string Salt) Hash(string password)
+    // Hashes the password using BCrypt and automatically generates a salt.
+    public static string Hash(string password)
     {
-       var salt = GenerateSalt();
-       var passwordHash = BCrypt.Net.BCrypt.HashPassword(password + salt);
-
-        return (Hash: passwordHash, Salt: salt);
+        return BCrypt.Net.BCrypt.HashPassword(password);
     }
 
-    public static bool Verify(string password, string passwordHash, string salt)
+    // Verifies the password against a given hash using BCrypt's built-in salt handling.
+    public static bool Verify(string password, string passwordHash)
     {
-        return BCrypt.Net.BCrypt.Verify(password+salt, passwordHash);
-    }
-
-    private static string GenerateSalt()
-    {
-        return Guid.NewGuid().ToString();
+        return BCrypt.Net.BCrypt.Verify(password, passwordHash);
     }
 }

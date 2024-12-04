@@ -17,7 +17,7 @@ namespace Kabutar.DataAccess.Repositories.Users
 
         public async Task<User> GetByEmailAsync(string email)
         {
-            return await _users.FirstOrDefaultAsync(u => u.Email == email);
+            return await _users.FirstOrDefaultAsync(u => u.Email.ToLower().Trim() == email);
         }
 
         public async Task<User> GetByUsernameAsync(string username)
@@ -25,14 +25,13 @@ namespace Kabutar.DataAccess.Repositories.Users
             return await _users.FirstOrDefaultAsync(u => u.Username == username);
         }
 
-        public async Task<bool> UpdatePasswordAsync(long userId, string newPasswordHash, string Salt)
+        public async Task<bool> UpdatePasswordAsync(long userId, string newPasswordHash)
         {
             var user = await _users.FindAsync(userId);
             if (user == null)
                 return false;
 
-            user.PasswordHash = newPasswordHash;  // Assume hashing is done outside this method
-            user.PasswordSalt = Salt;
+            user.PasswordHash = newPasswordHash; 
 
             await _context.SaveChangesAsync();
             return true;
