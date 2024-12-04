@@ -1,5 +1,6 @@
 ﻿
 
+using Kabutar.Domain.Attributes;
 using System.ComponentModel.DataAnnotations;
 
 namespace Kabutar.Service.DTOs.Common;
@@ -7,6 +8,7 @@ namespace Kabutar.Service.DTOs.Common;
 public class EmailMessage
 {
     [Required]
+    [Email]
     public string To { get; set; } = string.Empty;
 
     [Required]

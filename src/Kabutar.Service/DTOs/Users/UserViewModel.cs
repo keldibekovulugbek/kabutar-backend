@@ -13,7 +13,7 @@ public record UserViewModel
     public string CreatedAt { get; set; } = string.Empty;
     public string ImagePath { get; set; } = string.Empty;
     public string Fullname { get; set; } = string.Empty;
-    public string About { get; set; } = string.Empty;
+    public string? About { get; set; } = string.Empty;
 
     public static implicit operator UserViewModel(User user)
     {

@@ -1,6 +1,7 @@
 ﻿using Kabutar.Domain.Entities.Messages;
 using Kabutar.Domain.Entities.Users;
 using Microsoft.EntityFrameworkCore;
+using System.Text.RegularExpressions;
 
 
 namespace Kabutar.DataAccess.Context;
@@ -17,6 +18,32 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        foreach (var entity in modelBuilder.Model.GetEntityTypes())
+        {
+            entity.SetTableName(ToSnakeCase(entity.GetTableName()));
+
+            foreach (var property in entity.GetProperties())
+            {
+                // Convert each column name to snake_case.
+                property.SetColumnName(ToSnakeCase(property.Name));
+            }
+
+            foreach (var key in entity.GetKeys())
+            {
+                key.SetName(ToSnakeCase(key.GetName()));
+            }
+
+            foreach (var key in entity.GetForeignKeys())
+            {
+                key.SetConstraintName(ToSnakeCase(key.GetConstraintName()));
+            }
+
+            foreach (var index in entity.GetIndexes())
+            {
+                index.SetDatabaseName(ToSnakeCase(index.Name));
+            }
+        }
+
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.Entity<Message>()
@@ -37,5 +64,11 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Message>()
             .HasQueryFilter(m => !m.IsDeletedBySender && !m.IsDeletedByReceiver);
     }
+    private static string ToSnakeCase(string input)
+    {
+        if (string.IsNullOrEmpty(input)) { return input; }
 
+        var startUnderscores = Regex.Match(input, @"^_+");
+        return startUnderscores + Regex.Replace(input, @"([a-z0-9])([A-Z])", "$1_$2").ToLower();
+    }
 }
