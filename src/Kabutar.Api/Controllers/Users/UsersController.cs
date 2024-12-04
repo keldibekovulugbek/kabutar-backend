@@ -21,27 +21,27 @@ public class UsersController : ControllerBase
         _identityHelperService = identityHelperService;
     }
 
-    [HttpGet, AllowAnonymous]
+    [HttpGet, Authorize]
     public async Task<IActionResult> GetAllAsync()
         => Ok(await _userService.GetAllAsync());
 
-    [HttpGet("{userId}"), AllowAnonymous]
+    [HttpGet("{userId}"), Authorize]
     public async Task<IActionResult> GetIdAsync(long userId)
         => Ok(await _userService.GetIdAsync(userId));
 
-    [HttpGet("username"), AllowAnonymous]
+    [HttpGet("username"), Authorize]
     public async Task<IActionResult> GetUsernameAsync(string username)
     => Ok(await _userService.GetUsernameAsync(username));
 
-    [HttpPut, AllowAnonymous]
+    [HttpPut, ]
     public async Task<IActionResult> UpdateAsync([FromForm] UserUpdateDTO userUpdateViewModel)
         => Ok(await _userService.UpdateAsync((long)_identityHelperService.GetUserId()!, userUpdateViewModel));
 
-    [HttpDelete("{userId}"), AllowAnonymous]
+    [HttpDelete("{userId}"), Authorize]
     public async Task<IActionResult> DeleteAsync(long userId)
         => Ok(await _userService.DeleteAsync(userId));
 
-    [HttpPost("images/upload"), AllowAnonymous]
+    [HttpPost("images/upload"), Authorize]
     public async Task<IActionResult> ImageUpdateAsync(int id, [FromForm] AccountImageUploadDTO dto)
         => Ok(await _userService.ImageUpdateAsync((long)_identityHelperService.GetUserId()!, dto));
 
