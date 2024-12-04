@@ -42,7 +42,7 @@ namespace Kabutar.Service.Services.Accounts;
                 if (user.IsEmailVerified is false)
                     throw new StatusCodeException(HttpStatusCode.BadRequest, message: "email did not verified");
 
-                if (PasswordHasher.Verify(accountLogin.Password, user.PasswordSalt, user.PasswordHash))
+                if (PasswordHasher.Verify(accountLogin.Password, user.PasswordHash, user.PasswordSalt))
                     return _authManager.GenerateToken(user);
                 else throw new StatusCodeException(HttpStatusCode.BadRequest, message: "password is wrong");
             }
