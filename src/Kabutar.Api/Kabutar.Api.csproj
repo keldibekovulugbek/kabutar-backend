@@ -21,6 +21,7 @@
   <ItemGroup>
     <Folder Include="Controllers\Attachments\" />
     <Folder Include="Controllers\Messages\" />
+    <Folder Include="wwwroot\Images\profile-images\" />
   </ItemGroup>
 	<ItemGroup>
 

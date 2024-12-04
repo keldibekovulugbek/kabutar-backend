@@ -10,6 +10,8 @@ namespace Kabutar.Service.Services.Common
         private readonly string _basePath = string.Empty;
         private readonly string _imageFolderName = "images";
 
+        private readonly string _profileImagesFolderName = "profile-images";
+
         public FileService(IWebHostEnvironment webHost)
         {
             _basePath = webHost.WebRootPath;
@@ -27,13 +29,13 @@ namespace Kabutar.Service.Services.Common
                 Directory.CreateDirectory(_basePath);
             }
 
-            if (!Directory.Exists(Path.Combine(_basePath, _imageFolderName)))
+            if (!Directory.Exists(Path.Combine(_basePath, _imageFolderName,_profileImagesFolderName)))
             {
-                Directory.CreateDirectory(Path.Combine(_basePath, _imageFolderName));
+                Directory.CreateDirectory(Path.Combine(_basePath, _imageFolderName, _profileImagesFolderName));
             }
 
             string fileName = ImageHelper.MakeImageName(image.FileName);
-            string partPath = Path.Combine(_imageFolderName, fileName);
+            string partPath = Path.Combine(_imageFolderName,_profileImagesFolderName, fileName);
             string path = Path.Combine(_basePath, partPath);
 
             var stream = File.Create(path);
