@@ -17,7 +17,7 @@ namespace Kabutar.Service.Services.Common
             _basePath = webHost.WebRootPath;
         }
 
-        string IFileService.ImageFolderName => _imageFolderName;
+        string IFileService.ImageFolderName => Path.Combine(_imageFolderName,_profileImagesFolderName);
 
         public async Task<string> SaveImageAsync(IFormFile image)
         {

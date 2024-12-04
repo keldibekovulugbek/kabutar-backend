@@ -33,29 +33,29 @@ namespace Kabutar.Service.Services.Accounts;
 
         public async Task<string> LogInAsync(LoginDTO accountLogin)
         {
-            if (accountLogin.Username.Contains('@'))
+            if (accountLogin.UsernameOrEmail.Contains('@'))
             {
-                var user = await _unitOfWork.Users.GetByEmailAsync(accountLogin.Username.ToLower().Trim());
+                var user = await _unitOfWork.Users.GetByEmailAsync(accountLogin.UsernameOrEmail.ToLower().Trim());
 
                 if (user is null) throw new StatusCodeException(HttpStatusCode.NotFound, message: "email is wrong");
 
                 if (user.IsEmailVerified is false)
                     throw new StatusCodeException(HttpStatusCode.BadRequest, message: "email did not verified");
 
-                if (PasswordHasher.Verify(accountLogin.Password, user.PasswordHash, user.PasswordSalt))
+                if (PasswordHasher.Verify(accountLogin.Password, user.PasswordHash))
                     return _authManager.GenerateToken(user);
                 else throw new StatusCodeException(HttpStatusCode.BadRequest, message: "password is wrong");
             }
             else
             {
-                var user = await _unitOfWork.Users.GetByUsernameAsync(accountLogin.Username);
+                var user = await _unitOfWork.Users.GetByUsernameAsync(accountLogin.UsernameOrEmail);
 
                 if (user is null) throw new StatusCodeException(HttpStatusCode.NotFound, message: "username is wrong");
 
                 if (user.IsEmailVerified is false)
                     throw new StatusCodeException(HttpStatusCode.BadRequest, message: "email did not verified");
 
-                if (PasswordHasher.Verify(accountLogin.Password, user.PasswordSalt, user.PasswordHash))
+                if (PasswordHasher.Verify(accountLogin.Password, user.PasswordHash))
                     return _authManager.GenerateToken(user);
                 else throw new StatusCodeException(HttpStatusCode.BadRequest, message: "password is wrong");
             }
@@ -68,10 +68,11 @@ namespace Kabutar.Service.Services.Accounts;
             if (user is not null) throw new StatusCodeException(HttpStatusCode.BadRequest, message: "user already exist");
 
             var newUser = (User)accountCreate;
-            var hashResult = PasswordHasher.Hash(accountCreate.Password);
-            newUser.PasswordSalt = hashResult.Salt;
-            newUser.PasswordHash = hashResult.Hash;
+
+            newUser.PasswordHash = PasswordHasher.Hash(accountCreate.Password); ;
+            
             newUser.ProfilePicture = $"{_fileService.ImageFolderName}/default.jpg";
+
             newUser.Created = TimeHelper.GetCurrentDateTime();
             newUser.Updated = TimeHelper.GetCurrentDateTime();
 
@@ -129,12 +130,9 @@ namespace Kabutar.Service.Services.Accounts;
             if (user.IsEmailVerified is false)
                 throw new StatusCodeException(HttpStatusCode.BadRequest, message: "Email did not verified");
 
-            var changedPassword = PasswordHasher.Hash(userResetPassword.Password);
+            user.PasswordHash = PasswordHasher.Hash(userResetPassword.Password);
 
-            user.PasswordHash = changedPassword.Hash;
-            user.PasswordSalt = changedPassword.Salt;
-
-        await _unitOfWork.Users.UpdateAsync(user.Id, user);
+            await _unitOfWork.Users.UpdateAsync(user.Id, user);
 
             return true;
         }

@@ -1,4 +1,5 @@
 ﻿using Kabutar.Domain.Entities.Users;
+using Kabutar.Domain.Attributes;
 using NpgsqlTypes;
 using System;
 using System.Collections.Generic;
@@ -9,12 +10,15 @@ namespace Kabutar.Service.DTOs.Users;
 public class UserUpdateDTO
 {
     [Required]
+    [Name]
     public string Firstname { get; set; } = string.Empty;
 
     [Required]
+    [Name]
     public string Lastname { get; set; } = string.Empty;
 
     [Required]
+    [UsernameCheck]
     public string Username { get; set; } = string.Empty;
 
     public string? About { get; set; }
