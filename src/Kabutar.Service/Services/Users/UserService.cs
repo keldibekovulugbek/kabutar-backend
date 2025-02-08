@@ -32,7 +32,7 @@ namespace Kabutar.Service.Services.Users
             var result = await _unitOfWork.Users.GetByIdAsync(id);
 
             if (result is null)
-                throw new StatusCodeException(HttpStatusCode.NotFound, message: "User don't exist");
+                throw new StatusCodeException(HttpStatusCode.NotFound, message: "User does not exist");
 
 
             await _unitOfWork.Users.DeleteAsync(result);
@@ -61,7 +61,7 @@ namespace Kabutar.Service.Services.Users
             var user = await _unitOfWork.Users.GetByUsernameAsync(username.Trim());
 
             if (user is null)
-                throw new StatusCodeException(HttpStatusCode.NotFound, message: "User not found");
+                throw new StatusCodeException(HttpStatusCode.NotFound, message: "User does not exist");
 
             var userView = (UserViewModel)user;
 
@@ -73,7 +73,7 @@ namespace Kabutar.Service.Services.Users
             var user = await _unitOfWork.Users.GetByIdAsync(id);
 
             if (user is null)
-                throw new StatusCodeException(HttpStatusCode.NotFound, message: "User not found");
+                throw new StatusCodeException(HttpStatusCode.NotFound, message: "User does not exist");
 
             var userView = (UserViewModel)user;
 
@@ -102,10 +102,10 @@ namespace Kabutar.Service.Services.Users
             //var phoneNumber = await _unitOfWork.Users.GetByPhonNumberAsync(viewModel.PhoneNumber.Trim());
 
             if (user is null)
-                throw new StatusCodeException(HttpStatusCode.NotFound, message: "User not found");
+                throw new StatusCodeException(HttpStatusCode.NotFound, message: "User does not exist");
 
             if (userName is not null && userName.Username != user.Username)
-                throw new StatusCodeException(HttpStatusCode.BadRequest, message: "This username already exist");
+                throw new StatusCodeException(HttpStatusCode.BadRequest, message: "This username already exists");
 
             //if (phoneNumber is not null && phoneNumber.PhoneNumber != user.PhoneNumber)
             //    throw new StatusCodeException(HttpStatusCode.BadRequest, message: "This phoneNumber already exist");
