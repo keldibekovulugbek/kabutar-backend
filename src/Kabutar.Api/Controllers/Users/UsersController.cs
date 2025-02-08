@@ -21,15 +21,15 @@ public class UsersController : ControllerBase
         _identityHelperService = identityHelperService;
     }
 
-    [HttpGet, Authorize]
+    [HttpGet]
     public async Task<IActionResult> GetAllAsync()
         => Ok(await _userService.GetAllAsync());
 
-    [HttpGet("{userId}"), Authorize]
+    [HttpGet("{userId}")]
     public async Task<IActionResult> GetIdAsync(long userId)
         => Ok(await _userService.GetIdAsync(userId));
 
-    [HttpGet("username"), Authorize]
+    [HttpGet("username")]
     public async Task<IActionResult> GetUsernameAsync(string username)
     => Ok(await _userService.GetUsernameAsync(username));
 
