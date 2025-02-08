@@ -33,7 +33,8 @@ packages/
 # Environment files
 .env
 .env.*
-
+#migrations
+*migration*.cs
 # Configuration files
 appsettings.json
 appsettings.*.json
@@ -74,3 +75,10 @@ desktop.ini
 *.tar.gz
 *.rar
 *.7z
+#dll files
+*.dll
+*.pdb
+*.exe
+*.jpg
+*.png
+*.json
