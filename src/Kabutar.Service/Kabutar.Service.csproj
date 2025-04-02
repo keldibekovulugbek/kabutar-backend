@@ -6,15 +6,6 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Folder Include="DTOs\Attachments\" />
-    <Folder Include="DTOs\Messages\" />
-    <Folder Include="Interfaces\Attachments\" />
-    <Folder Include="Interfaces\Messages\" />
-    <Folder Include="Services\Attachments\" />
-    <Folder Include="Services\Messages\" />
-  </ItemGroup>
-
 
 	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />

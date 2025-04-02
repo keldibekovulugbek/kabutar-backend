@@ -7,10 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Interfaces\Attachments\" />
     <Folder Include="Interfaces\Common\" />
-    <Folder Include="Migrations\" />
-    <Folder Include="Repositories\Attachments\" />
     <Folder Include="Repositories\Common\" />
   </ItemGroup>
 

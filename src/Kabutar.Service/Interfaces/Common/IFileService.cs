@@ -1,11 +1,15 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Kabutar.Domain.Enums;
+using Microsoft.AspNetCore.Http;
 
-namespace Kabutar.Service.Interfaces.Common
+namespace Kabutar.Service.Interfaces.Common;
+
+public interface IFileService
 {
-    public interface IFileService
-    {
-        public string ImageFolderName { get; }
-        Task<string> SaveImageAsync(IFormFile image);
-        Task<bool> DeleteImageAsync(string relativeFilePath);
-    }
+    string RootFolder { get; }
+    string ImageFolderName { get; }
+
+    Task<string> SaveImageAsync(IFormFile image);
+    Task<string> SaveAsync(IFormFile file, FileCategory category);
+
+    Task<bool> DeleteImageAsync(string relativeFilePath);
 }

@@ -1,5 +1,4 @@
-﻿
-namespace Kabutar.Domain.Common;
+﻿namespace Kabutar.Domain.Common;
 
 public abstract class BaseEntity
 {

@@ -19,8 +19,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\Attachments\" />
-    <Folder Include="Controllers\Messages\" />
+    <Folder Include="wwwroot\audio\music\" />
+    <Folder Include="wwwroot\audio\voice\" />
+    <Folder Include="wwwroot\documents\pdf\" />
+    <Folder Include="wwwroot\documents\word\" />
+    <Folder Include="wwwroot\images\message\" />
+    <Folder Include="wwwroot\images\preview\" />
+    <Folder Include="wwwroot\images\profile\" />
+    <Folder Include="wwwroot\temp\chunks\" />
+    <Folder Include="wwwroot\videos\" />
   </ItemGroup>
 	<ItemGroup>
 

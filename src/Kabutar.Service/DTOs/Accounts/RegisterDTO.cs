@@ -1,6 +1,4 @@
-﻿
-
-using Kabutar.Domain.Entities.Users;
+﻿using Kabutar.Domain.Entities.Users;
 using Kabutar.Domain.Attributes;
 using System.ComponentModel.DataAnnotations;
 

@@ -2,39 +2,35 @@
 using Kabutar.DataAccess.Interfaces.Users;
 using Kabutar.Domain.Entities.Users;
 using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
 
-namespace Kabutar.DataAccess.Repositories.Users
+namespace Kabutar.DataAccess.Repositories.Users;
+
+public class UserRepository : GenericRepository<User>, IUserRepository
 {
-    public class UserRepository : GenericRepository<User>, IUserRepository
+    public UserRepository(AppDbContext context) : base(context) { }
+
+    public async Task<User?> GetByEmailAsync(string email)
     {
-        private readonly DbSet<User> _users;
+        return await _dbSet
+            .FirstOrDefaultAsync(u => u.Email.ToLower().Trim() == email.ToLower().Trim());
+    }
 
-        public UserRepository(AppDbContext context) : base(context)
-        {
-            _users = context.Set<User>();
-        }
+    public async Task<User?> GetByUsernameAsync(string username)
+    {
+        return await _dbSet
+            .FirstOrDefaultAsync(u => u.Username.ToLower().Trim() == username.ToLower().Trim());
+    }
 
-        public async Task<User> GetByEmailAsync(string email)
-        {
-            return await _users.FirstOrDefaultAsync(u => u.Email.ToLower().Trim() == email);
-        }
+    public async Task<bool> UpdatePasswordAsync(long userId, string newPasswordHash)
+    {
+        var user = await _dbSet.FindAsync(userId);
+        if (user is null) return false;
 
-        public async Task<User> GetByUsernameAsync(string username)
-        {
-            return await _users.FirstOrDefaultAsync(u => u.Username == username);
-        }
+        user.PasswordHash = newPasswordHash;
+        user.Updated = DateTime.UtcNow;
 
-        public async Task<bool> UpdatePasswordAsync(long userId, string newPasswordHash)
-        {
-            var user = await _users.FindAsync(userId);
-            if (user == null)
-                return false;
-
-            user.PasswordHash = newPasswordHash; 
-
-            await _context.SaveChangesAsync();
-            return true;
-        }
+        _dbSet.Update(user);
+        await _context.SaveChangesAsync();
+        return true;
     }
 }

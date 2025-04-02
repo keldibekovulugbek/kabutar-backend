@@ -1,10 +1,8 @@
-﻿
-namespace Kabutar.Service.Interfaces.Common
+﻿namespace Kabutar.Service.Interfaces.Common;
+
+public interface IIdentityHelperService
 {
-    public interface IIdentityHelperService
-    {
-        long? GetUserId();
-        string GetUserName();
-        string GetUserEmail();
-    }
+    long? GetUserId();
+    string GetUserName();
+    string GetUserEmail();
 }
