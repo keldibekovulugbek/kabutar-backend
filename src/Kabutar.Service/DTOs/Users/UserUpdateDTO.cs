@@ -1,8 +1,5 @@
 ﻿using Kabutar.Domain.Entities.Users;
 using Kabutar.Domain.Attributes;
-using NpgsqlTypes;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Kabutar.Service.DTOs.Users;

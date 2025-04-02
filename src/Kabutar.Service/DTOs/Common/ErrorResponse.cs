@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Kabutar.Service.DTOs.Common;
 
-namespace Kabutar.Service.DTOs.Common
+public class ErrorResponse
 {
-    public class ErrorResponse
-    {
-        public int StatusCode { get; set; }
+    public int StatusCode { get; set; }
 
-        public string Message { get; set; } = default!;
-    }
+    public string Message { get; set; } = default!;
 }

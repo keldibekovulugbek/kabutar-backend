@@ -2,64 +2,75 @@
 using Microsoft.AspNetCore.Http;
 using Kabutar.Service.Helpers;
 using Kabutar.Service.Interfaces.Common;
+using Kabutar.Domain.Enums;
 
-namespace Kabutar.Service.Services.Common
+namespace Kabutar.Service.Services.Common;
+
+public class FileService : IFileService
 {
-    public class FileService : IFileService
+    private readonly string _basePath;
+    private readonly string _imageFolderName = "images";
+    private readonly string _profileImagesFolderName = "profile";
+
+    public string RootFolder => _basePath;
+    public string ImageFolderName => Path.Combine(_imageFolderName, _profileImagesFolderName);
+
+    public FileService(IWebHostEnvironment webHost)
     {
-        private readonly string _basePath = string.Empty;
-        private readonly string _imageFolderName = "images";
+        _basePath = webHost.WebRootPath;
+    }
 
-        private readonly string _profileImagesFolderName = "profile-images";
+    public async Task<string> SaveImageAsync(IFormFile image)
+        => await SaveAsync(image, FileCategory.ProfilePicture);
 
-        public FileService(IWebHostEnvironment webHost)
+    public async Task<string> SaveAsync(IFormFile file, FileCategory category)
+    {
+        if (file == null || file.Length == 0)
+            return "";
+
+        string folder = GetFolderPath(category);
+        string saveDir = Path.Combine(_basePath, folder);
+
+        if (!Directory.Exists(saveDir))
+            Directory.CreateDirectory(saveDir);
+
+        string fileName = FileNameGenerator.Generate(file.FileName, category);
+        string relativePath = Path.Combine(folder, fileName);
+        string fullPath = Path.Combine(_basePath, relativePath);
+
+        using var stream = File.Create(fullPath);
+        await file.CopyToAsync(stream);
+
+        return relativePath.Replace("\\", "/");
+    }
+
+    public Task<bool> DeleteImageAsync(string relativeFilePath)
+    {
+        string fullPath = Path.Combine(_basePath, relativeFilePath);
+        if (!File.Exists(fullPath)) return Task.FromResult(false);
+
+        try
         {
-            _basePath = webHost.WebRootPath;
+            File.Delete(fullPath);
+            return Task.FromResult(true);
         }
-
-        string IFileService.ImageFolderName => Path.Combine(_imageFolderName,_profileImagesFolderName);
-
-        public async Task<string> SaveImageAsync(IFormFile image)
+        catch
         {
-            if (image is null)
-                return "";
-
-            if (!Directory.Exists(_basePath))
-            {
-                Directory.CreateDirectory(_basePath);
-            }
-
-            if (!Directory.Exists(Path.Combine(_basePath, _imageFolderName,_profileImagesFolderName)))
-            {
-                Directory.CreateDirectory(Path.Combine(_basePath, _imageFolderName, _profileImagesFolderName));
-            }
-
-            string fileName = ImageHelper.MakeImageName(image.FileName);
-            string partPath = Path.Combine(_imageFolderName,_profileImagesFolderName, fileName);
-            string path = Path.Combine(_basePath, partPath);
-
-            var stream = File.Create(path);
-            await image.CopyToAsync(stream);
-            stream.Close();
-
-            return partPath;
+            return Task.FromResult(false);
         }
+    }
 
-        public Task<bool> DeleteImageAsync(string relativeFilePath)
+    private string GetFolderPath(FileCategory category)
+    {
+        return category switch
         {
-            string absoluteFilePath = Path.Combine(_basePath, relativeFilePath);
-
-            if (!File.Exists(absoluteFilePath)) return Task.FromResult(false);
-
-            try
-            {
-                File.Delete(absoluteFilePath);
-                return Task.FromResult(true);
-            }
-            catch
-            {
-                return Task.FromResult(false);
-            }
-        }
+            FileCategory.ProfilePicture => "images/profile",
+            FileCategory.MessageImage => "images/message",
+            FileCategory.Document => "documents",
+            FileCategory.Video => "videos",
+            FileCategory.Music => "audio/music",
+            FileCategory.VoiceMessage => "audio/voice",
+            _ => "misc"
+        };
     }
 }

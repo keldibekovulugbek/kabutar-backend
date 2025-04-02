@@ -1,18 +1,16 @@
-﻿using Kabutar.Domain.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
+﻿using System.Linq.Expressions;
+using Kabutar.Domain.Common;
 
-namespace Kabutar.DataAccess.Interfaces
+namespace Kabutar.DataAccess.Interfaces;
+
+public interface IGenericRepository<T> where T : BaseEntity
 {
-    public interface IGenericRepository<T> where T : BaseEntity
-    {
-        Task<IEnumerable<T>> GetAllAsync();
-        Task<T> GetByIdAsync(long id);
-        Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate);
-        Task AddAsync(T entity);
-        Task UpdateAsync(long id, T entity);
-        Task DeleteAsync(T entity);
-    }
+    Task<IEnumerable<T>> GetAllAsync(bool asNoTracking = true);
+    Task<T?> GetByIdAsync(long id, bool asNoTracking = true);
+    Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate, bool asNoTracking = true);
+
+    Task AddAsync(T entity);
+    Task UpdateAsync(T entity);
+    Task DeleteAsync(long id);
+    Task DeleteAsync(T entity);
 }

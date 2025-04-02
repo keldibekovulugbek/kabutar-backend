@@ -3,10 +3,12 @@ using Kabutar.Domain.Common;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
-public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity, new()
+namespace Kabutar.DataAccess.Repositories;
+
+public class GenericRepository<T> : IGenericRepository<T> where T : Auditable, new()
 {
     protected readonly DbContext _context;
-    private readonly DbSet<T> _dbSet;
+    protected readonly DbSet<T> _dbSet;
 
     public GenericRepository(DbContext context)
     {
@@ -14,38 +16,72 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity, 
         _dbSet = context.Set<T>();
     }
 
-    public async Task<IEnumerable<T>> GetAllAsync()
+    public async Task<IEnumerable<T>> GetAllAsync(bool asNoTracking = true)
     {
-        return await _dbSet.ToListAsync();
+        var query = _dbSet.Where(x => !x.IsDeleted);
+
+        if (asNoTracking)
+            query = query.AsNoTracking();
+
+        return await query.ToListAsync();
     }
 
-    public async Task<T> GetByIdAsync(long id)
+    public async Task<T?> GetByIdAsync(long id, bool asNoTracking = true)
     {
-        return await _dbSet.FindAsync(id);
+        var query = _dbSet.Where(x => x.Id == id && !x.IsDeleted);
+
+        if (asNoTracking)
+            query = query.AsNoTracking();
+
+        return await query.FirstOrDefaultAsync();
     }
 
-    public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
+    public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate, bool asNoTracking = true)
     {
-        return await _dbSet.Where(predicate).ToListAsync();
+        var query = _dbSet.Where(x => !x.IsDeleted).Where(predicate);
+
+        if (asNoTracking)
+            query = query.AsNoTracking();
+
+        return await query.ToListAsync();
     }
 
     public async Task AddAsync(T entity)
     {
+        entity.Created = DateTime.UtcNow;
+        entity.Updated = DateTime.UtcNow;
         await _dbSet.AddAsync(entity);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(); 
     }
 
-    public async Task UpdateAsync(long id, T entity)
+    public async Task UpdateAsync(T entity)
     {
-        entity.Id = id;
+        entity.Updated = DateTime.UtcNow;
         _dbSet.Update(entity);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(); 
+    }
+
+    public async Task DeleteAsync(long id)
+    {
+        var entity = await _dbSet.FindAsync(id);
+        if (entity is null || entity.IsDeleted) return;
+
+        entity.IsDeleted = true;
+        entity.Updated = DateTime.UtcNow;
+
+        _dbSet.Update(entity);
+        await _context.SaveChangesAsync(); 
     }
 
     public async Task DeleteAsync(T entity)
     {
+        if (entity.IsDeleted) return;
+
         entity.IsDeleted = true;
+        entity.Updated = DateTime.UtcNow;
+
         _dbSet.Update(entity);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(); 
     }
+
 }

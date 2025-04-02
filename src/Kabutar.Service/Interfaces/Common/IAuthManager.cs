@@ -1,10 +1,8 @@
-﻿
-using Kabutar.Domain.Entities.Users;
+﻿using Kabutar.Domain.Entities.Users;
 
-namespace Kabutar.Service.Interfaces.Common
+namespace Kabutar.Service.Interfaces.Common;
+
+public interface IAuthManager
 {
-    public interface IAuthManager
-    {
-        public string GenerateToken(User user);
-    }
+    public string GenerateToken(User user);
 }

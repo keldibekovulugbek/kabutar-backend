@@ -1,7 +1,6 @@
-﻿
-
-using Kabutar.DataAccess.Context;
+﻿using Kabutar.DataAccess.Context;
 using Kabutar.DataAccess.Interfaces.Messages;
+using Kabutar.Domain.DTOs.Messages;
 using Kabutar.Domain.Entities.Messages;
 using Kabutar.Domain.Entities.Users;
 using Microsoft.EntityFrameworkCore;
@@ -10,91 +9,90 @@ namespace Kabutar.DataAccess.Repositories.Messages;
 
 public class MessageRepository : GenericRepository<Message>, IMessageRepository
 {
-   private readonly DbSet<Message> messages;
+    public MessageRepository(AppDbContext context) : base(context) { }
 
-
-    public MessageRepository(AppDbContext context) : base(context)
-    {
-        messages = context.Set<Message>();
-    }
-
-    // Mark a message as read by its ID
-    public async Task MarkMessageAsReadAsync(long messageId)
-    {
-        var message = await messages.FindAsync(messageId);
-        if (message != null)
-        {
-            message.IsRead = true;
-            await _context.SaveChangesAsync();
-        }
-    }
-
-    // Get all messages exchanged between two specific users
     public async Task<IEnumerable<Message>> GetMessagesBetweenUsersAsync(long userId1, long userId2)
     {
-        return await messages
-            .Where(m => (m.SenderId == userId1 && m.ReceiverId == userId2) ||
-                        (m.SenderId == userId2 && m.ReceiverId == userId1))
-            .OrderBy(m => m.Created) // Assuming 'Created' is a DateTime property on Message
+        return await _dbSet
+            .Where(m =>
+                (m.SenderId == userId1 && m.ReceiverId == userId2 && !m.IsDeletedBySender) ||
+                (m.SenderId == userId2 && m.ReceiverId == userId1 && !m.IsDeletedByReceiver)
+            )
+            .OrderBy(m => m.Created)
             .ToListAsync();
     }
 
-    // Fetch all unread messages for a specific user
     public async Task<IEnumerable<Message>> GetUnreadMessagesForUserAsync(long userId)
     {
-        return await messages
-            .Where(m => m.ReceiverId == userId && !m.IsRead)
+        return await _dbSet
+            .Where(m => m.ReceiverId == userId && !m.IsRead && !m.IsDeletedByReceiver)
             .ToListAsync();
     }
 
-    // Soft delete a message for a user, depending on if the user is the sender or receiver
-    public async Task DeleteMessageForUserAsync(long messageId, long userId, bool isSender)
+    public async Task<Message?> GetLastMessageBetweenUsersAsync(long userId1, long userId2)
     {
-        var message = await messages.FindAsync(messageId);
-        if (message != null)
+        return await _dbSet
+            .Where(m =>
+                (m.SenderId == userId1 && m.ReceiverId == userId2 && !m.IsDeletedBySender) ||
+                (m.SenderId == userId2 && m.ReceiverId == userId1 && !m.IsDeletedByReceiver)
+            )
+            .OrderByDescending(m => m.Created)
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task<IEnumerable<UserWithLastMessageVM>> GetAllUsersAndLastMessagesWithOneUserAsync(long userId)
+    {
+        var messages = await _dbSet
+            .Include(m => m.Sender)
+            .Include(m => m.Receiver)
+            .Where(m =>
+                (m.SenderId == userId && !m.IsDeletedBySender) ||
+                (m.ReceiverId == userId && !m.IsDeletedByReceiver)
+            )
+            .OrderByDescending(m => m.Created)
+            .ToListAsync();
+
+        var grouped = messages
+            .GroupBy(m => m.SenderId == userId ? m.ReceiverId : m.SenderId)
+            .Select(group =>
+            {
+                var lastMessage = group.First();
+                var contactUser = lastMessage.SenderId == userId ? lastMessage.Receiver : lastMessage.Sender;
+                var unreadCount = group.Count(m => m.ReceiverId == userId && !m.IsRead);
+
+                return new UserWithLastMessageVM
+                {
+                    User = contactUser,
+                    LastMessage = lastMessage,
+                    UnreadCount = unreadCount
+                };
+            });
+
+        return grouped;
+    }
+
+    public async Task MarkMessageAsReadAsync(long messageId)
+    {
+        var message = await _dbSet.FindAsync(messageId);
+        if (message is not null && !message.IsRead)
         {
-            if (isSender && message.SenderId == userId)
-            {
-                message.IsDeletedBySender = true;
-            }
-            else if (!isSender && message.ReceiverId == userId)
-            {
-                message.IsDeletedByReceiver = true;
-            }
+            message.IsRead = true;
+            message.Updated = DateTime.UtcNow;
+            _dbSet.Update(message);
             await _context.SaveChangesAsync();
         }
     }
 
-    public async Task<Message> GetLastMessageBetweenUsersAsync(long userId1, long userId2)
+    public async Task DeleteMessageForUserAsync(long messageId, long userId, bool isSender)
     {
-        return (await messages
-            .Where(m => (m.SenderId == userId1 && m.ReceiverId == userId2) ||
-                        (m.SenderId == userId2 && m.ReceiverId == userId1))
-            .OrderBy(m => m.Created).FirstOrDefaultAsync())!;
-    }
+        var message = await _dbSet.FindAsync(messageId);
+        if (message is null) return;
 
-    public async Task<IEnumerable<(User,Message)>> GetAllUsersAndLastMessagesWithOneUserAsync(long userId)
-    {
-        var sentMessages = messages
-            .Where(m => m.SenderId == userId)
-            .Select(m => m.Receiver);
+        if (isSender) message.IsDeletedBySender = true;
+        else message.IsDeletedByReceiver = true;
 
-        var receivedMessages = messages
-            .Where(m => m.ReceiverId == userId)
-            .Select(m => m.Sender);
-
-        var allUsers = await sentMessages
-            .Union(receivedMessages)
-            .Distinct()
-            .ToListAsync();
-
-        var lastMessages = new List<(User, Message)>();
-        foreach (var user in allUsers)
-        {
-            var lastMessage = await GetLastMessageBetweenUsersAsync(userId, user.Id);
-            lastMessages.Add((user, lastMessage));
-        }
-
-        return lastMessages;
+        message.Updated = DateTime.UtcNow;
+        _dbSet.Update(message);
+        await _context.SaveChangesAsync();
     }
 }

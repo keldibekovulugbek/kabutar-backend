@@ -1,9 +1,8 @@
 ﻿using Kabutar.Service.DTOs.Common;
 
-namespace Kabutar.Service.Interfaces.Common
+namespace Kabutar.Service.Interfaces.Common;
+
+public interface IEmailService
 {
-    public interface IEmailService
-    {
-        public Task SendAsync(EmailMessage message);
-    }
+    public Task SendAsync(EmailMessage message);
 }

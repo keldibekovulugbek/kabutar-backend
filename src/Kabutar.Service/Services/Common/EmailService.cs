@@ -5,118 +5,111 @@ using MailKit.Security;
 using Microsoft.Extensions.Configuration;
 using MimeKit;
 using MimeKit.Text;
-using System;
-using System.Threading.Tasks;
 
-namespace Kabutar.Service.Services.Common
+namespace Kabutar.Service.Services.Common;
+
+public class EmailService : IEmailService
 {
-    public class EmailService : IEmailService
+    private readonly IConfigurationSection _config;
+
+    public EmailService(IConfiguration configuration)
     {
-        private readonly IConfigurationSection _config;
+        _config = configuration.GetSection("Email");
+    }
 
-        public EmailService(IConfiguration configuration)
+    public async Task SendAsync(EmailMessage message)
+    {
+        var email = new MimeMessage();
+        email.From.Add(MailboxAddress.Parse(_config["EmailAddress"]!));
+        email.To.Add(MailboxAddress.Parse(message.To));
+        email.Subject = message.Subject;
+        email.Body = new TextPart(TextFormat.Html)
         {
-            _config = configuration.GetSection("Email");
+            Text = GenerateBeautifulHtml(message.Body)
+        };
+
+        using var smtp = new SmtpClient();
+        try
+        {
+            int port = int.Parse(_config["Port"] ?? "587");
+            await smtp.ConnectAsync(_config["Host"], port, SecureSocketOptions.StartTls);
+            await smtp.AuthenticateAsync(_config["EmailAddress"], _config["Password"]);
+            await smtp.SendAsync(email);
         }
-
-        public async Task SendAsync(EmailMessage message)
+        catch (Exception ex)
         {
-            var email = new MimeMessage();
-            email.From.Add(MailboxAddress.Parse(_config["EmailAddress"]));
-            email.To.Add(MailboxAddress.Parse(message.To));
-            email.Subject = message.Subject;
-            email.Body = new TextPart(TextFormat.Html) { Text = $@"
+            throw new InvalidOperationException("Email yuborishda xatolik yuz berdi.", ex);
+        }
+        finally
+        {
+            await smtp.DisconnectAsync(true);
+        }
+    }
+
+    private string GenerateBeautifulHtml(string code)
+    {
+        return $@"
 <!DOCTYPE html>
 <html lang='en'>
 <head>
     <meta charset='UTF-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Kabutar Verification Code</title>
     <style>
         body {{
-            font-family: 'Arial', sans-serif;
-            background-color: #f7f7f7;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
             margin: 0;
             padding: 0;
-            color: #333;
         }}
-        .email-container {{
+        .container {{
             max-width: 600px;
             margin: 40px auto;
-            background: #ffffff;
-            border: 1px solid #dddddd;
-            overflow: hidden;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }}
-        .email-header {{
+        .header {{
             background-color: #007bff;
-            color: #ffffff;
+            color: white;
             padding: 20px;
+            border-radius: 10px 10px 0 0;
             text-align: center;
-            border-radius: 7px 7px 0 0;
         }}
-        .email-body {{
-            padding: 20px;
-            line-height: 1.5;
-        }}
-        .email-body p {{
-            margin: 20px 0;
-        }}
-        .otp-code {{
-            font-size: 20px;
+        .code {{
+            font-size: 24px;
             font-weight: bold;
+            background: #e9ecef;
+            padding: 12px 20px;
+            border-radius: 6px;
             display: inline-block;
-            margin: 10px 0;
-            padding: 10px 15px;
-            border-radius: 5px;
-            background-color: #e9ecef;
-            border: 1px solid #cccccc;
+            margin: 20px 0;
             color: #007bff;
+            letter-spacing: 2px;
         }}
         .footer {{
-            font-size: 12px;
             text-align: center;
-            color: #aaaaaa;
-            padding: 20px;
+            font-size: 12px;
+            color: #999;
+            margin-top: 30px;
         }}
     </style>
 </head>
 <body>
-    <div class='email-container'>
-        <div class='email-header'>
-            <h1>Your OTP Code</h1>
+    <div class='container'>
+        <div class='header'>
+            <h2>Kabutar OTP Code</h2>
         </div>
-        <div class='email-body'>
-            <p>Hello,</p>
-            <p>Your One-Time Password (OTP) for accessing your account is:</p>
-            <p class='otp-code'>{message.Body}</p>
-            <p>Please enter this code on the website to proceed. Remember, this code is valid for only 15 minutes.</p>
-        </div>
+        <p>Salom,</p>
+        <p>Quyida sizning tasdiqlash kodlaringiz:</p>
+        <p class='code'>{code}</p>
+        <p>Bu kod 15 daqiqa amal qiladi. Kodni hech kimga bermang.</p>
         <div class='footer'>
-            <p>If you did not request this code, please ignore this email or contact support.</p>
+            <p>Agar bu so‘rov siz tomonidan yuborilmagan bo‘lsa, iltimos, e’tiborsiz qoldiring.</p>
         </div>
     </div>
 </body>
-</html>" };
-
-            using (var smtp = new SmtpClient())
-            {
-                try
-                {
-                    await smtp.ConnectAsync(_config["Host"], 587, SecureSocketOptions.StartTls);
-                    await smtp.AuthenticateAsync(_config["EmailAddress"], _config["Password"]);
-                    await smtp.SendAsync(email);
-                }
-                catch (Exception ex)
-                {
-                    // Log or handle the exception as needed
-                    throw new InvalidOperationException("Failed to send email.", ex);
-                }
-                finally
-                {
-                    await smtp.DisconnectAsync(true);
-                }
-            }
-        }
+</html>";
     }
 }
