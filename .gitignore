@@ -76,7 +76,5 @@ desktop.ini
 *.dll
 *.pdb
 *.exe
-*.jpg
-*.png
-*.json
+
 AppDbContextModelSnapshot.cs
