@@ -35,9 +35,6 @@ packages/
 .env.*
 #migrations
 *migration*.cs
-# Configuration files
-appsettings.json
-appsettings.*.json
 
 # Database files
 *.bak
