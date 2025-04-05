@@ -4,9 +4,15 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <OutputType>Exe</OutputType>
   </PropertyGroup>
+	<ItemGroup>
+		<None Update="appsettings.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
 
-  <ItemGroup>
+	<ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.11" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.11">
       <PrivateAssets>all</PrivateAssets>
@@ -30,7 +36,6 @@
     <Folder Include="wwwroot\documents\word\" />
     <Folder Include="wwwroot\images\message\" />
     <Folder Include="wwwroot\images\preview\" />
-    <Folder Include="wwwroot\images\profile\" />
     <Folder Include="wwwroot\temp\chunks\" />
     <Folder Include="wwwroot\videos\" />
   </ItemGroup>

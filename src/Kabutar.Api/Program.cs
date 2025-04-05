@@ -13,6 +13,7 @@ builder.AddApiLayer();
 
 
 
+
 //-> Middlewares
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
@@ -33,7 +34,7 @@ app.UseStaticFiles();
 app.UseMiddleware<ExceptionHandlerMiddleware>();
 app.UseCors("AllowAll");
 app.MapHub<ChatHub>("/hubs/chat");
-//app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
