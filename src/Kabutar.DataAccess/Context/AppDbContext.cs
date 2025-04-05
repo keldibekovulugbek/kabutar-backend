@@ -17,37 +17,49 @@ public class AppDbContext : DbContext
     public virtual DbSet<User> Users { get; set; } = null!;
     public virtual DbSet<Message> Messages { get; set; } = null!;
     public virtual DbSet<Attachment> Attachments { get; set; } = null!;
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
-        // ✅ snake_case conversion
         foreach (var entity in modelBuilder.Model.GetEntityTypes())
         {
-            entity.SetTableName(ToSnakeCase(entity.GetTableName() ?? ""));
+            var tableName = entity.GetTableName();
+            if (!string.IsNullOrWhiteSpace(tableName))
+            {
+                entity.SetTableName(ToSnakeCase(tableName));
+            }
 
             foreach (var property in entity.GetProperties())
                 property.SetColumnName(ToSnakeCase(property.Name));
 
             foreach (var key in entity.GetKeys())
-                key.SetName(ToSnakeCase(key.GetName() ?? ""));
+            {
+                var keyName = key.GetName();
+                if (!string.IsNullOrWhiteSpace(keyName))
+                    key.SetName(ToSnakeCase(keyName));
+            }
 
             foreach (var fk in entity.GetForeignKeys())
-                fk.SetConstraintName(ToSnakeCase(fk.GetConstraintName() ?? ""));
+            {
+                var constraintName = fk.GetConstraintName();
+                if (!string.IsNullOrWhiteSpace(constraintName))
+                    fk.SetConstraintName(ToSnakeCase(constraintName));
+            }
 
             foreach (var index in entity.GetIndexes())
-                index.SetDatabaseName(ToSnakeCase(index.Name ?? ""));
+            {
+                var indexName = index.Name;
+                if (!string.IsNullOrWhiteSpace(indexName))
+                    index.SetDatabaseName(ToSnakeCase(indexName));
+            }
         }
 
-        // ✅ Message ↔ Sender
         modelBuilder.Entity<Message>()
             .HasOne(m => m.Sender)
             .WithMany(u => u.SentMessages)
             .HasForeignKey(m => m.SenderId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // ✅ Message ↔ Receiver
         modelBuilder.Entity<Message>()
             .HasOne(m => m.Receiver)
             .WithMany(u => u.ReceivedMessages)
@@ -84,7 +96,13 @@ public class AppDbContext : DbContext
     private static string ToSnakeCase(string input)
     {
         if (string.IsNullOrEmpty(input)) return input;
+
         var startUnderscores = Regex.Match(input, @"^_+");
-        return startUnderscores + Regex.Replace(input, @"([a-z0-9])([A-Z])", "$1_$2").ToLower();
+        return startUnderscores + Regex.Replace(
+            input,
+            @"([a-z0-9])([A-Z])",
+            "$1_$2",
+            RegexOptions.Compiled).ToLower();
     }
+
 }
