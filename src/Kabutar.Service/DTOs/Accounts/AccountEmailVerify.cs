@@ -1,6 +1,4 @@
-﻿
-
-using Kabutar.Domain.Attributes;
+﻿using Kabutar.Domain.Attributes;
 using System.ComponentModel.DataAnnotations;
 
 namespace Kabutar.Service.DTOs.Accounts;

@@ -35,9 +35,6 @@ packages/
 .env.*
 #migrations
 *migration*.cs
-# Configuration files
-appsettings.json
-appsettings.*.json
 
 # Database files
 *.bak
@@ -82,3 +79,4 @@ desktop.ini
 *.jpg
 *.png
 *.json
+AppDbContextModelSnapshot.cs
