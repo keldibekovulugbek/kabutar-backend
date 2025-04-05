@@ -14,7 +14,7 @@ namespace Kabutar.Api.Configurations.Dependencies
                 options.UseNpgsql(connectionString);
                 options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
             });
-
+             
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
         }
     }
