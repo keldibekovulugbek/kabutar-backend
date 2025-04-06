@@ -1,39 +1,24 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
 
-namespace Kabutar.Domain.Attributes
+namespace Kabutar.Domain.Attributes;
+
+[AttributeUsage(AttributeTargets.Property)]
+public class StrongPasswordAttribute : ValidationAttribute
 {
-    public class StrongPasswordAttribute : ValidationAttribute
+    private const string _pattern = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,50}$";
+
+    protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
     {
-        protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
-        {
-            if (value is null) return new ValidationResult("Password can not be null!");
-            else
-            {
-                string password = value.ToString()!;
-                if (password.Length < 8)
-                    return new ValidationResult("Password must be at least 8 characters!");
-                else if (password.Length > 50)
-                    return new ValidationResult("Password must be less than 50 characters!");
-                var result = IsStrong(password);
+        if (value is null) return new ValidationResult("Password cannot be null!");
 
-                if (result.IsValid is false) return new ValidationResult(result.Message);
-                return ValidationResult.Success;
-            }
-        }
+        var password = value.ToString();
+        if (string.IsNullOrWhiteSpace(password))
+            return new ValidationResult("Password cannot be empty!");
 
-        public (bool IsValid, string Message) IsStrong(string password)
-        {
-            bool isDigit = password.Any(x => char.IsDigit(x));
-            bool isLower = password.Any(x => char.IsLower(x));
-            bool isUpper = password.Any(x => char.IsUpper(x));
-            if (!isLower)
-                return (IsValid: false, Message: "Password must be at least one lower letter!");
-            if (!isUpper)
-                return (IsValid: false, Message: "Password must be at least one upper letter!");
-            if (!isDigit)
-                return (IsValid: false, Message: "Password must be at least one digit!");
+        if (!Regex.IsMatch(password, _pattern))
+            return new ValidationResult("Password must be 8-50 characters and include at least one lowercase, one uppercase, and one digit.");
 
-            return (IsValid: true, Message: "Password is strong");
-        }
+        return ValidationResult.Success;
     }
 }

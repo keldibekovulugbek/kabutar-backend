@@ -1,5 +1,4 @@
 ﻿using Kabutar.Service.DTOs.Accounts;
-using Kabutar.Service.DTOs.Common;
 using Kabutar.Service.DTOs.Users;
 namespace Kabutar.Service.Interfaces.Users;
 

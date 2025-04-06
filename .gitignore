@@ -33,10 +33,8 @@ packages/
 # Environment files
 .env
 .env.*
-
-# Configuration files
-appsettings.json
-appsettings.*.json
+#migrations
+*migration*.cs
 
 # Database files
 *.bak
@@ -74,3 +72,9 @@ desktop.ini
 *.tar.gz
 *.rar
 *.7z
+#dll files
+*.dll
+*.pdb
+*.exe
+
+AppDbContextModelSnapshot.cs

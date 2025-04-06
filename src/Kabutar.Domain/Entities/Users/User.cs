@@ -1,6 +1,7 @@
 ﻿using Kabutar.Domain.Attributes;
 using Kabutar.Domain.Common;
 using Kabutar.Domain.Entities.Messages;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Kabutar.Domain.Entities.Users;
 
@@ -18,19 +19,18 @@ public class User : Auditable
     [Email]
     public string Email { get; set; } = string.Empty;
 
-    [AllowedFiles(new string[] { ".jpg", ".jpeg", ".png" })]
+    [AllowedFiles(new[] { ".jpg", ".jpeg", ".png" })]
     public string ProfilePicture { get; set; } = string.Empty;
 
-    public bool IsEmailVerified { get; set; } = false;
+    public bool IsEmailVerified { get; set; }
 
     public string PasswordHash { get; set; } = string.Empty;
 
-    public string? About { get; set; } = string.Empty;
+    public string? About { get; set; }
 
     public DateTime? LastActive { get; set; }
 
     public virtual ICollection<Message> SentMessages { get; set; } = new HashSet<Message>();
 
     public virtual ICollection<Message> ReceivedMessages { get; set; } = new HashSet<Message>();
-
 }

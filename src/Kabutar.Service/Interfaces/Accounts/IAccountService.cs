@@ -1,17 +1,12 @@
 ﻿using Kabutar.Service.DTOs.Accounts;
 
-
 namespace Kabutar.Service.Interfaces.Accounts;
 
 public interface IAccountService
 {
-    Task<string> LogInAsync(LoginDTO accountLogin);
-
-    Task<bool> RegisterAsync(RegisterDTO accountCreate);
-
-    Task<bool> VerifyEmailAsync(AccountEmailVerify verifyEmail);
-
-    Task SendCodeAsync(SendToEmailDTO sendToEmail);
-
-    Task<bool> VerifyPasswordAsync(AccountResetPasswordDTO userResetPassword);
+    Task<string> LogInAsync(LoginDTO dto);
+    Task<bool> RegisterAsync(RegisterDTO dto);
+    Task<bool> VerifyEmailAsync(AccountEmailVerify dto);
+    Task SendCodeAsync(SendToEmailDTO dto);
+    Task<bool> ResetPasswordAsync(AccountResetPasswordDTO dto);
 }

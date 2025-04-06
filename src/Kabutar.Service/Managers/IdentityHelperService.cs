@@ -1,32 +1,30 @@
 ﻿using Kabutar.Service.Interfaces.Common;
 using Microsoft.AspNetCore.Http;
-namespace Kabutar.Service.Managers
+using System.Security.Claims;
+namespace Kabutar.Service.Managers;
+
+public class IdentityHelperService : IIdentityHelperService
 {
-    public class IdentityHelperService : IIdentityHelperService
+    private readonly IHttpContextAccessor _accessor;
+
+    public IdentityHelperService(IHttpContextAccessor accessor)
     {
-        private readonly IHttpContextAccessor _accessor;
+        _accessor = accessor;
+    }
 
-        public IdentityHelperService(IHttpContextAccessor accessor)
-        {
-            this._accessor = accessor;
-        }
+    public long? GetUserId()
+    {
+        var claim = _accessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier);
+        return claim != null && long.TryParse(claim.Value, out var id) ? id : null;
+    }
 
-        public string GetUserEmail()
-        {
-            var res = _accessor.HttpContext!.User.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress");
-            return res is not null ? res.Value : string.Empty;
-        }
+    public string GetUserName()
+    {
+        return _accessor.HttpContext?.User?.FindFirst(ClaimTypes.Name)?.Value ?? string.Empty;
+    }
 
-        public long? GetUserId()
-        {
-            var res = _accessor.HttpContext!.User.FindFirst("Id");
-            return res is not null ? long.Parse(res.Value) : null; 
-        }
-
-        public string GetUserName()
-        {
-            var res = _accessor.HttpContext!.User.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name");
-            return res is not null ? res.Value : string.Empty;
-        }
+    public string GetUserEmail()
+    {
+        return _accessor.HttpContext?.User?.FindFirst(ClaimTypes.Email)?.Value ?? string.Empty;
     }
 }
