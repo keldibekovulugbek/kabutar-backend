@@ -45,16 +45,21 @@ public class UsersController : ControllerBase
     /// <summary>
     /// Joriy foydalanuvchi profilingini yangilash
     /// </summary>
+    /// 
+    [Authorize]
     [HttpPut]
     public async Task<IActionResult> UpdateAsync([FromBody] UserUpdateDTO dto)
     {
         var userId = _identity.GetUserId() ?? throw new UnauthorizedAccessException("User not found in token.");
+        
         return Ok(await _userService.UpdateAsync(userId, dto));
     }
 
     /// <summary>
     /// Profil rasmini yangilash
     /// </summary>
+    /// 
+    [Authorize]
     [HttpPost("image")]
     public async Task<IActionResult> UploadImageAsync([FromForm] AccountImageUploadDTO dto)
     {
@@ -65,6 +70,8 @@ public class UsersController : ControllerBase
     /// <summary>
     /// Joriy foydalanuvchini o‘chirish
     /// </summary>
+    /// 
+    [Authorize]
     [HttpDelete]
     public async Task<IActionResult> DeleteAsync()
     {

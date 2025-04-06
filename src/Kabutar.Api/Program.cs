@@ -1,7 +1,10 @@
 using Kabutar.Api.Configurations.Dependencies;
 using Kabutar.Api.Hubs;
 using Kabutar.Api.Middlewares;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Serilog;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
@@ -10,6 +13,7 @@ builder.Services.AddSwaggerGen();
 builder.AddDataAccessLayer();
 builder.AddServiceLayer();
 builder.AddApiLayer();
+
 
 
 

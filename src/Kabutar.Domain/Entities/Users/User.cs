@@ -24,7 +24,6 @@ public class User : Auditable
 
     public bool IsEmailVerified { get; set; }
 
-    [NotMapped] 
     public string PasswordHash { get; set; } = string.Empty;
 
     public string? About { get; set; }

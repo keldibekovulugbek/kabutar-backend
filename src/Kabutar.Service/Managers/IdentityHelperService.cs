@@ -14,7 +14,7 @@ public class IdentityHelperService : IIdentityHelperService
 
     public long? GetUserId()
     {
-        var claim = _accessor.HttpContext?.User?.FindFirst("Id");
+        var claim = _accessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier);
         return claim != null && long.TryParse(claim.Value, out var id) ? id : null;
     }
 
