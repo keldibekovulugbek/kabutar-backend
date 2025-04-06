@@ -45,7 +45,8 @@ public class MessageService : IMessageService
 
         if (dto.Attachment is not null)
         {
-            var filePath = await _fileService.SaveAsync(dto.Attachment, FileCategory.MessageImage);
+            var category = DetectFileCategory(dto.Attachment.FileName);
+            var filePath = await _fileService.SaveAsync(dto.Attachment, category);
             message.Content += $" [file: {filePath}]";
         }
 
@@ -92,5 +93,20 @@ public class MessageService : IMessageService
             LastMessage = res.LastMessage?.Content ?? "",
             Timestamp = res.LastMessage?.Created ?? DateTime.MinValue
         });
+    }
+    private FileCategory DetectFileCategory(string fileName)
+    {
+        var ext = Path.GetExtension(fileName).ToLower();
+
+        return ext switch
+        {
+            ".jpg" or ".jpeg" or ".png" => FileCategory.MessageImage,
+            ".pdf" => FileCategory.Document,
+            ".doc" or ".docx" => FileCategory.Document,
+            ".mp4" or ".avi" => FileCategory.Video,
+            ".mp3" => FileCategory.Music,
+            ".wav" => FileCategory.VoiceMessage,
+            _ => FileCategory.Document // default
+        };
     }
 }
