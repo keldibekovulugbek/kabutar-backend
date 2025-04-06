@@ -36,6 +36,7 @@
     <Folder Include="wwwroot\documents\word\" />
     <Folder Include="wwwroot\images\message\" />
     <Folder Include="wwwroot\images\preview\" />
+    <Folder Include="wwwroot\misc\" />
     <Folder Include="wwwroot\temp\chunks\" />
     <Folder Include="wwwroot\videos\" />
   </ItemGroup>
