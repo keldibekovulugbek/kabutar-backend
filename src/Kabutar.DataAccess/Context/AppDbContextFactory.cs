@@ -9,7 +9,6 @@ namespace Kabutar.DataAccess.Context
     {
         public AppDbContext CreateDbContext(string[] args)
         {
-            // 📍 Bu yerni loyihangga moslashtir
             var basePath = Path.Combine(Directory.GetCurrentDirectory(), "../Kabutar.Api");
 
             var config = new ConfigurationBuilder()

@@ -87,4 +87,14 @@ public class UserService : IUserService
         await _unitOfWork.Users.UpdateAsync(user);
         return true;
     }
+
+    public async Task UpdateLastActiveAsync(long userId)
+    {
+        var user = await _unitOfWork.Users.GetByIdAsync(userId);
+        if (user != null)
+        {
+            user.LastActive = TimeHelper.GetCurrentDateTime();
+            await _unitOfWork.Users.UpdateAsync(user);
+        }
+    }
 }

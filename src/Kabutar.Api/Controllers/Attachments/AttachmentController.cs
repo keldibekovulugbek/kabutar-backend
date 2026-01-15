@@ -27,6 +27,28 @@ public class AttachmentController : ControllerBase
     }
 
     /// <summary>
+    /// Download attachment file
+    /// </summary>
+    [HttpGet("download/{messageId:long}")]
+    public async Task<IActionResult> DownloadAsync([FromRoute] long messageId)
+    {
+        var attachment = await _attachmentService.GetByMessageIdAsync(messageId);
+
+        if (attachment == null)
+            return NotFound(new { message = "Attachment not found" });
+
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", attachment.FilePath.TrimStart('/'));
+
+        if (!System.IO.File.Exists(filePath))
+            return NotFound(new { message = "File not found on server" });
+
+        var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
+        var fileName = Path.GetFileName(filePath);
+
+        return File(fileBytes, attachment.MimeType, fileName);
+    }
+
+    /// <summary>
     /// Delete an attachment by message ID
     /// </summary>
     [HttpDelete("message/{messageId:long}")]

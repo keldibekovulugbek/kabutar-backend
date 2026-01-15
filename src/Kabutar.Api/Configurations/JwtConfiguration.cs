@@ -20,7 +20,7 @@ namespace Kabutar.Api.Configurations
                         ValidIssuer = _config["Issuer"],
                         ValidateAudience = false,
                         ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Key"]))
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Key"] ?? throw new InvalidOperationException("JWT Key is not configured")))
                     };
                 });
         }

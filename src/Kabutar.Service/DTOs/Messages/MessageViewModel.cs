@@ -14,6 +14,8 @@ public class MessageViewModel
 
     public bool IsRead { get; set; }
 
+    public bool HasAttachment { get; set; }
+
     public DateTime Created { get; set; }
 
     public static implicit operator MessageViewModel(Message message)
@@ -25,6 +27,7 @@ public class MessageViewModel
             ReceiverId = message.ReceiverId,
             Content = message.Content!,
             IsRead = message.IsRead,
+            HasAttachment = message.Attachment != null,
             Created = message.Created
         };
     }
