@@ -10,4 +10,5 @@ public interface IUserService
     Task<UserViewModel> GetUsernameAsync(string username);
     Task<bool> ImageUpdateAsync(long id, AccountImageUploadDTO dto);
     Task<IEnumerable<UserViewModel>> GetAllAsync();
+    Task UpdateLastActiveAsync(long userId);
 }

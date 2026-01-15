@@ -11,6 +11,7 @@ namespace Kabutar.Api.Configurations.Dependencies
             builder.Services.AddScoped<IChatNotifier, ChatNotifier>();
 
             builder.Services.ConfigureCorsPolicy();
+            builder.Services.ConfigureRateLimiting();
             builder.Services.AddHttpContextAccessor();
             builder.ConfigureJwt();
             builder.Services.ConfigureSwaggerAuthorize();
