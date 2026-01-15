@@ -14,6 +14,7 @@ public class MessageRepository : GenericRepository<Message>, IMessageRepository
     public async Task<IEnumerable<Message>> GetMessagesBetweenUsersAsync(long userId1, long userId2)
     {
         return await _dbSet
+            .Include(m => m.Attachment)
             .Where(m =>
                 (m.SenderId == userId1 && m.ReceiverId == userId2 && !m.IsDeletedBySender) ||
                 (m.SenderId == userId2 && m.ReceiverId == userId1 && !m.IsDeletedByReceiver)
@@ -25,6 +26,7 @@ public class MessageRepository : GenericRepository<Message>, IMessageRepository
     public async Task<IEnumerable<Message>> GetUnreadMessagesForUserAsync(long userId)
     {
         return await _dbSet
+            .Include(m => m.Attachment)
             .Where(m => m.ReceiverId == userId && !m.IsRead && !m.IsDeletedByReceiver)
             .ToListAsync();
     }
@@ -32,6 +34,7 @@ public class MessageRepository : GenericRepository<Message>, IMessageRepository
     public async Task<Message?> GetLastMessageBetweenUsersAsync(long userId1, long userId2)
     {
         return await _dbSet
+            .Include(m => m.Attachment)
             .Where(m =>
                 (m.SenderId == userId1 && m.ReceiverId == userId2 && !m.IsDeletedBySender) ||
                 (m.SenderId == userId2 && m.ReceiverId == userId1 && !m.IsDeletedByReceiver)
@@ -45,6 +48,7 @@ public class MessageRepository : GenericRepository<Message>, IMessageRepository
         var messages = await _dbSet
             .Include(m => m.Sender)
             .Include(m => m.Receiver)
+            .Include(m => m.Attachment)
             .Where(m =>
                 (m.SenderId == userId && !m.IsDeletedBySender) ||
                 (m.ReceiverId == userId && !m.IsDeletedByReceiver)

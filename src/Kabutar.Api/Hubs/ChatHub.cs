@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using Kabutar.Service.Interfaces.Users;
+using Microsoft.AspNetCore.SignalR;
 using System.Collections.Concurrent;
 
 namespace Kabutar.Api.Hubs;
@@ -7,6 +8,12 @@ public class ChatHub : Hub
 {
     // Connected users (connectionId ↔ userId)
     private static readonly ConcurrentDictionary<string, long> _connections = new();
+    private readonly IServiceProvider _serviceProvider;
+
+    public ChatHub(IServiceProvider serviceProvider)
+    {
+        _serviceProvider = serviceProvider;
+    }
 
     // ✅ On connected
     public override async Task OnConnectedAsync()
@@ -16,11 +23,18 @@ public class ChatHub : Hub
 
         if (user?.Identity?.IsAuthenticated ?? false)
         {
-            var userIdStr = user.FindFirst("Id")?.Value;
+            var userIdStr = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
             if (long.TryParse(userIdStr, out var userId))
             {
                 _connections.TryAdd(Context.ConnectionId, userId);
+
+                // Update LastActive
+                using (var scope = _serviceProvider.CreateScope())
+                {
+                    var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
+                    await userService.UpdateLastActiveAsync(userId);
+                }
 
                 // Real-time event
                 await Clients.All.SendAsync("UserConnected", userId);
@@ -35,6 +49,13 @@ public class ChatHub : Hub
     {
         if (_connections.TryRemove(Context.ConnectionId, out var userId))
         {
+            // Update LastActive when disconnecting
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
+                await userService.UpdateLastActiveAsync(userId);
+            }
+
             // Real-time event
             await Clients.All.SendAsync("UserDisconnected", userId);
         }
@@ -73,7 +94,7 @@ public class ChatHub : Hub
     // ✅ Helper
     private long GetUserId()
     {
-        var userIdStr = Context.User?.FindFirst("Id")?.Value;
+        var userIdStr = Context.User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
         return long.TryParse(userIdStr, out var id) ? id : throw new UnauthorizedAccessException("User ID not found in token");
     }
 
