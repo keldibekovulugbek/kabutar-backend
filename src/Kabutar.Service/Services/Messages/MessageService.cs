@@ -1,4 +1,5 @@
-﻿using Kabutar.Domain.Entities.Messages;
+using Kabutar.Domain.Entities.Messages;
+using Kabutar.Domain.Entities.Attachments;
 using Kabutar.Domain.Enums;
 using Kabutar.Service.DTOs.Messages;
 using Kabutar.Service.Exceptions;
@@ -43,14 +44,28 @@ public class MessageService : IMessageService
             Updated = TimeHelper.GetCurrentDateTime()
         };
 
+        // Save message first to get ID
+        await _unitOfWork.Messages.AddAsync(message);
+
+        // Handle attachment if present
         if (dto.Attachment is not null)
         {
             var category = DetectFileCategory(dto.Attachment.FileName);
             var filePath = await _fileService.SaveAsync(dto.Attachment, category);
-            message.Content += $" [file: {filePath}]";
-        }
 
-        await _unitOfWork.Messages.AddAsync(message);
+            // Create attachment record in database
+            var attachment = new Attachment
+            {
+                MessageId = message.Id,
+                FilePath = filePath,
+                MimeType = dto.Attachment.ContentType,
+                FileType = category.ToString(),
+                Created = TimeHelper.GetCurrentDateTime(),
+                Updated = TimeHelper.GetCurrentDateTime()
+            };
+
+            await _unitOfWork.Attachments.AddAsync(attachment);
+        }
 
         // Real-time notify
         await _notifier.SendMessageToUserAsync(dto.ReceiverId, new

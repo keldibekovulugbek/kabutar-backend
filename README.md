@@ -11,6 +11,10 @@ Welcome to the **Kabutar Backend**! This is the server-side powerhouse for **Kab
 - 📎 **File Attachments**: Attach and share files in messages.
 - 🖼️ **User Profiles**: Customize profile pictures and "About" info.
 - 🗄️ **Reliable Storage**: PostgreSQL database for scalable data management.
+- 🛡️ **Rate Limiting**: Protection against brute force attacks.
+- 🔒 **Environment Variables**: Secure configuration management.
+- 📧 **Email Verification**: Verify user emails with OTP codes.
+- ⏰ **Last Active**: Track user activity timestamps.
 
 ---
 
@@ -39,22 +43,33 @@ git clone https://github.com/keldibekovulugbek/kabutar-backend.git
 cd kabutar-backend
 ```
 
-### 2️⃣ Set Up the Database
-- Make sure PostgreSQL is running.
-- Create a database named `KabutarDB`.
-- Update the connection string in `appsettings.json`:
-```json
-"ConnectionStrings": {
-    "DefaultConnection": "Host=localhost;Database=KabutarDB;Username=your_user;Password=your_password"
-}
+### 2️⃣ Configure Environment Variables
+- Copy `.env.example` to `.env`
+- Update the values in `.env` with your configuration:
+```env
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=kabutar-db
+DB_USER=postgres
+DB_PASSWORD=your_password
+
+JWT_KEY=your-secret-jwt-key-here-minimum-32-characters
+EMAIL_ADDRESS=your-email@gmail.com
+EMAIL_PASSWORD=your-gmail-app-password
+
+CORS_ALLOWED_ORIGINS=http://localhost:3000,http://localhost:5173
 ```
 
-### 3️⃣ Apply Migrations
+### 3️⃣ Set Up the Database
+- Make sure PostgreSQL is running
+- Create database: `createdb kabutar-db`
+
+### 4️⃣ Apply Migrations
 ```bash
 dotnet ef database update
 ```
 
-### 4️⃣ Run the Application
+### 5️⃣ Run the Application
 Start the backend with:
 ```bash
 dotnet run

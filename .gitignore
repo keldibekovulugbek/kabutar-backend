@@ -25,6 +25,9 @@ desktop.ini
 # Temporary files
 *.tmp
 *.temp
+tmpclaude-*-cwd
+*.py
+*.ps1
 
 # Package Folders
 packages/
