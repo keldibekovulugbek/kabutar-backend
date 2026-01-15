@@ -1,6 +1,7 @@
 ﻿using Kabutar.Service.DTOs.Common;
 using Kabutar.Service.Exceptions;
 using Newtonsoft.Json;
+using Serilog;
 
 namespace   Kabutar.Api.Middlewares
 {
@@ -33,6 +34,13 @@ namespace   Kabutar.Api.Middlewares
 
         public async Task ClientErrorHandleAsync(HttpContext httpContext, StatusCodeException exception)
         {
+            // Log client errors (400-level)
+            Log.Warning("⚠️ Client Error on {Method} {Path}: {StatusCode} - {Message}",
+                httpContext.Request.Method,
+                httpContext.Request.Path,
+                (int)exception.HttpStatusCode,
+                exception.Message);
+
             httpContext.Response.ContentType = "application/json";
             ErrorResponse result = new()
             {
@@ -45,6 +53,12 @@ namespace   Kabutar.Api.Middlewares
 
         public async Task SystemErrorHandleAsync(HttpContext httpContext, Exception exception)
         {
+            // Log server errors (500-level) with full stack trace
+            Log.Error(exception, "❌ Server Error on {Method} {Path}: {Message}",
+                httpContext.Request.Method,
+                httpContext.Request.Path,
+                exception.Message);
+
             httpContext.Response.ContentType = "application/json";
             ErrorResponse result = new();
             if (_env.IsProduction())
