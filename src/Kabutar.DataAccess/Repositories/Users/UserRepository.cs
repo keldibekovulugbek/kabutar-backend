@@ -33,4 +33,21 @@ public class UserRepository : GenericRepository<User>, IUserRepository
         await _context.SaveChangesAsync();
         return true;
     }
+
+    public async Task<List<User>> SearchUsersAsync(string searchText, long currentUserId, int limit = 20)
+    {
+        var search = searchText.ToLower().Trim();
+
+        return await _dbSet
+            .Where(u => !u.IsDeleted
+                && u.IsEmailVerified
+                && u.Id != currentUserId
+                && (u.Username.ToLower().Contains(search)
+                    || u.FirstName.ToLower().Contains(search)
+                    || u.LastName.ToLower().Contains(search)
+                    || (u.FirstName.ToLower() + " " + u.LastName.ToLower()).Contains(search)))
+            .OrderBy(u => u.Username)
+            .Take(limit)
+            .ToListAsync();
+    }
 }

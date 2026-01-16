@@ -18,6 +18,7 @@ using Kabutar.Service.Services.Accounts;
 using Kabutar.Service.Services.Attachments;
 using Kabutar.Service.Services.Common;
 using Kabutar.Service.Services.Messages;
+using Kabutar.Service.Services.Search;
 using Kabutar.Service.Services.Users;
 
 namespace Kabutar.Api.Configurations.Dependencies
@@ -36,6 +37,7 @@ namespace Kabutar.Api.Configurations.Dependencies
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IMessageService, MessageService>();
             builder.Services.AddScoped<IAttachmentService, AttachmentService>();
+            builder.Services.AddScoped<ISearchService, SearchService>();
             builder.Services.AddScoped<IFileService, FileService>();
             builder.Services.AddScoped<IEmailService, EmailService>();
             builder.Services.AddScoped<IAuthManager, AuthManager>();

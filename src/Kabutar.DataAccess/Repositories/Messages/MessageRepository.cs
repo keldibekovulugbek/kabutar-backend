@@ -99,4 +99,21 @@ public class MessageRepository : GenericRepository<Message>, IMessageRepository
         _dbSet.Update(message);
         await _context.SaveChangesAsync();
     }
+
+    public async Task<List<Message>> SearchMessagesAsync(string searchText, long currentUserId, int limit = 20)
+    {
+        var search = searchText.ToLower().Trim();
+
+        return await _dbSet
+            .Include(m => m.Sender)
+            .Include(m => m.Receiver)
+            .Where(m => !string.IsNullOrEmpty(m.Content)
+                && (m.SenderId == currentUserId || m.ReceiverId == currentUserId)
+                && m.Content.ToLower().Contains(search)
+                && ((m.SenderId == currentUserId && !m.IsDeletedBySender)
+                    || (m.ReceiverId == currentUserId && !m.IsDeletedByReceiver)))
+            .OrderByDescending(m => m.Created)
+            .Take(limit)
+            .ToListAsync();
+    }
 }

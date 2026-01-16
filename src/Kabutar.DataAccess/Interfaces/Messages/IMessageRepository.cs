@@ -30,7 +30,12 @@ public interface IMessageRepository : IGenericRepository<Message>
     Task MarkMessageAsReadAsync(long messageId);
 
     /// <summary>
-    /// Foydalanuvchi uchun xabarni o‘chirish (soft delete)
+    /// Foydalanuvchi uchun xabarni o'chirish (soft delete)
     /// </summary>
     Task DeleteMessageForUserAsync(long messageId, long userId, bool isSender);
+
+    /// <summary>
+    /// Xabarlarni qidirish - foydalanuvchi bilan bog'liq xabarlar ichidan qidiradi
+    /// </summary>
+    Task<List<Message>> SearchMessagesAsync(string searchText, long currentUserId, int limit = 20);
 }
