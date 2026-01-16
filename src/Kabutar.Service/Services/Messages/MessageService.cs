@@ -105,8 +105,13 @@ public class MessageService : IMessageService
         {
             UserId = res.User.Id,
             Username = res.User.Username,
+            FirstName = res.User.FirstName,
+            LastName = res.User.LastName,
+            ProfilePicture = res.User.ProfilePicture,
             LastMessage = res.LastMessage?.Content ?? "",
-            Timestamp = res.LastMessage?.Created ?? DateTime.MinValue
+            Timestamp = res.LastMessage?.Created ?? DateTime.MinValue,
+            UnreadCount = res.UnreadCount,
+            IsOnline = res.User.LastActive.HasValue && res.User.LastActive.Value > DateTime.UtcNow.AddMinutes(-5)
         });
     }
     private FileCategory DetectFileCategory(string fileName)

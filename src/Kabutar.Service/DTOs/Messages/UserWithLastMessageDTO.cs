@@ -6,7 +6,17 @@ public class UserWithLastMessageDTO
 
     public string Username { get; set; } = string.Empty;
 
+    public string FirstName { get; set; } = string.Empty;
+
+    public string LastName { get; set; } = string.Empty;
+
+    public string? ProfilePicture { get; set; }
+
     public string LastMessage { get; set; } = string.Empty;
 
     public DateTime Timestamp { get; set; }
+
+    public int UnreadCount { get; set; }
+
+    public bool IsOnline { get; set; }
 }
