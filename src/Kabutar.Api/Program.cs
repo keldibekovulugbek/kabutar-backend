@@ -90,7 +90,8 @@ app.UseCors("AllowAll");
 app.UseIpRateLimiting();
 
 app.MapHub<ChatHub>("/hubs/chat");
-app.UseHttpsRedirection();
+// Disabled for development - WPF uses HTTP
+// app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
