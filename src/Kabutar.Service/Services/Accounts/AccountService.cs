@@ -44,11 +44,11 @@ public class AccountService : IAccountService
     public async Task<bool> RegisterAsync(RegisterDTO dto)
     {
         var existingUserByEmail = await _unitOfWork.Users.GetByEmailAsync(dto.Email.ToLower());
-        if (existingUserByEmail is not null && !existingUserByEmail.IsDeleted && existingUserByEmail.IsEmailVerified)
+        if (existingUserByEmail is not null && !existingUserByEmail.IsDeleted)
             throw new StatusCodeException(HttpStatusCode.BadRequest, "Email already exists.");
 
         var existingUserByUsername = await _unitOfWork.Users.GetByUsernameAsync(dto.Username.ToLower());
-        if (existingUserByUsername is not null && !existingUserByUsername.IsDeleted && existingUserByUsername.IsEmailVerified)
+        if (existingUserByUsername is not null && !existingUserByUsername.IsDeleted)
             throw new StatusCodeException(HttpStatusCode.BadRequest, "Username already exists.");
 
         var user = (User)dto;
