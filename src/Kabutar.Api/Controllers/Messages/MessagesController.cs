@@ -27,6 +27,13 @@ public class MessageController : ControllerBase
         return Ok(result);
     }
 
+    [HttpPost("text")]
+    public async Task<IActionResult> SendTextAsync([FromBody] MessageCreateDTO dto)
+    {
+        var result = await _messageService.SendMessageAsync(dto);
+        return Ok(result);
+    }
+
     [HttpGet("conversation/{userId:long}")]
     public async Task<IActionResult> GetConversationAsync([FromRoute] long userId)
     {
