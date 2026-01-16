@@ -55,30 +55,24 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// Log all incoming requests
+// Log all incoming requests (DISABLED FOR DEVELOPMENT PERFORMANCE)
+// Uncomment for production monitoring
+/*
 app.Use(async (context, next) =>
 {
     var requestTime = DateTime.UtcNow;
-    Log.Information("📥 Incoming Request: {Method} {Path} from {IP}",
-        context.Request.Method,
-        context.Request.Path,
-        context.Connection.RemoteIpAddress);
 
     await next.Invoke();
 
     var duration = DateTime.UtcNow - requestTime;
     var statusCode = context.Response.StatusCode;
 
-    if (statusCode >= 200 && statusCode < 300)
-        Log.Information("✅ Response Sent: {StatusCode} for {Method} {Path} in {Duration}ms",
-            statusCode, context.Request.Method, context.Request.Path, duration.TotalMilliseconds);
-    else if (statusCode >= 400 && statusCode < 500)
-        Log.Warning("⚠️ Client Error: {StatusCode} for {Method} {Path} in {Duration}ms",
-            statusCode, context.Request.Method, context.Request.Path, duration.TotalMilliseconds);
-    else if (statusCode >= 500)
+    // Only log errors in development
+    if (statusCode >= 500)
         Log.Error("❌ Server Error: {StatusCode} for {Method} {Path} in {Duration}ms",
             statusCode, context.Request.Method, context.Request.Path, duration.TotalMilliseconds);
 });
+*/
 
 app.UseStaticFiles();
 app.UseMiddleware<ExceptionHandlerMiddleware>();
