@@ -7,6 +7,7 @@ namespace Kabutar.DataAccess.Interfaces;
 public interface IUnitOfWork
 {
     IUserRepository Users { get; }
+    IUserSettingsRepository UserSettings { get; }
     IMessageRepository Messages { get; }
     IAttachmentRepository Attachments { get; }
 

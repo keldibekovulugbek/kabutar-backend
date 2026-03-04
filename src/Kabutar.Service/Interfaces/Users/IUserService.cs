@@ -11,4 +11,9 @@ public interface IUserService
     Task<bool> ImageUpdateAsync(long id, AccountImageUploadDTO dto);
     Task<IEnumerable<UserViewModel>> GetAllAsync();
     Task UpdateLastActiveAsync(long userId);
+
+    // User Settings
+    Task<UserSettingsViewModel> GetSettingsAsync(long userId);
+    Task<UserSettingsViewModel> UpdateSettingsAsync(long userId, UserSettingsUpdateDTO dto);
+    Task<bool> UploadChatBackgroundAsync(long userId, AccountImageUploadDTO dto);
 }

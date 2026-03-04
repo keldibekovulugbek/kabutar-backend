@@ -1,4 +1,4 @@
-
+﻿
 # Build Folders
 bin/
 obj/
@@ -81,3 +81,6 @@ desktop.ini
 *.exe
 
 AppDbContextModelSnapshot.cs
+
+# Claude Code
+.claude/

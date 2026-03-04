@@ -97,4 +97,111 @@ public class UserService : IUserService
             await _unitOfWork.Users.UpdateAsync(user);
         }
     }
+
+    public async Task<UserSettingsViewModel> GetSettingsAsync(long userId)
+    {
+        var user = await _unitOfWork.Users.GetByIdAsync(userId)
+            ?? throw new StatusCodeException(HttpStatusCode.NotFound, "User does not exist");
+
+        var settings = await _unitOfWork.UserSettings.GetByUserIdAsync(userId);
+
+        // Create default settings if not exists
+        if (settings == null)
+        {
+            settings = new UserSettings
+            {
+                UserId = userId,
+                Theme = "light",
+                FontSize = "medium",
+                ChatBackgroundImage = null
+            };
+            await _unitOfWork.UserSettings.AddAsync(settings);
+        }
+
+        return new UserSettingsViewModel
+        {
+            Id = settings.Id,
+            UserId = settings.UserId,
+            Theme = settings.Theme,
+            ChatBackgroundImage = settings.ChatBackgroundImage,
+            FontSize = settings.FontSize
+        };
+    }
+
+    public async Task<UserSettingsViewModel> UpdateSettingsAsync(long userId, UserSettingsUpdateDTO dto)
+    {
+        var user = await _unitOfWork.Users.GetByIdAsync(userId)
+            ?? throw new StatusCodeException(HttpStatusCode.NotFound, "User does not exist");
+
+        var settings = await _unitOfWork.UserSettings.GetByUserIdAsync(userId);
+
+        // Create settings if not exists
+        if (settings == null)
+        {
+            settings = new UserSettings
+            {
+                UserId = userId,
+                Theme = dto.Theme ?? "light",
+                FontSize = dto.FontSize ?? "medium",
+                ChatBackgroundImage = dto.ChatBackgroundImage
+            };
+            await _unitOfWork.UserSettings.AddAsync(settings);
+        }
+        else
+        {
+            // Update only non-null values
+            if (dto.Theme != null)
+                settings.Theme = dto.Theme;
+            if (dto.FontSize != null)
+                settings.FontSize = dto.FontSize;
+            if (dto.ChatBackgroundImage != null)
+                settings.ChatBackgroundImage = dto.ChatBackgroundImage;
+
+            settings.Updated = TimeHelper.GetCurrentDateTime();
+            await _unitOfWork.UserSettings.UpdateAsync(settings);
+        }
+
+        return new UserSettingsViewModel
+        {
+            Id = settings.Id,
+            UserId = settings.UserId,
+            Theme = settings.Theme,
+            ChatBackgroundImage = settings.ChatBackgroundImage,
+            FontSize = settings.FontSize
+        };
+    }
+
+    public async Task<bool> UploadChatBackgroundAsync(long userId, AccountImageUploadDTO dto)
+    {
+        var user = await _unitOfWork.Users.GetByIdAsync(userId)
+            ?? throw new StatusCodeException(HttpStatusCode.NotFound, "User does not exist");
+
+        var settings = await _unitOfWork.UserSettings.GetByUserIdAsync(userId);
+
+        // Create settings if not exists
+        if (settings == null)
+        {
+            settings = new UserSettings
+            {
+                UserId = userId,
+                Theme = "light",
+                FontSize = "medium"
+            };
+        }
+
+        // Delete old background if exists
+        if (!string.IsNullOrEmpty(settings.ChatBackgroundImage))
+            await _fileService.DeleteImageAsync(settings.ChatBackgroundImage);
+
+        // Save new background
+        settings.ChatBackgroundImage = await _fileService.SaveImageAsync(dto.Image);
+        settings.Updated = TimeHelper.GetCurrentDateTime();
+
+        if (settings.Id == 0)
+            await _unitOfWork.UserSettings.AddAsync(settings);
+        else
+            await _unitOfWork.UserSettings.UpdateAsync(settings);
+
+        return true;
+    }
 }

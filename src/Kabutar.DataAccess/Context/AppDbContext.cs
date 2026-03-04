@@ -15,6 +15,7 @@ public class AppDbContext : DbContext
 
 
     public virtual DbSet<User> Users { get; set; } = null!;
+    public virtual DbSet<UserSettings> UserSettings { get; set; } = null!;
     public virtual DbSet<Message> Messages { get; set; } = null!;
     public virtual DbSet<Attachment> Attachments { get; set; } = null!;
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -66,10 +67,18 @@ public class AppDbContext : DbContext
             .HasForeignKey(m => m.ReceiverId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        // UserSettings one-to-one relationship
+        modelBuilder.Entity<UserSettings>()
+            .HasOne(us => us.User)
+            .WithOne(u => u.Settings)
+            .HasForeignKey<UserSettings>(us => us.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         // ✅ Soft delete filters
         modelBuilder.Entity<User>().HasQueryFilter(u => !u.IsDeleted);
         modelBuilder.Entity<Message>().HasQueryFilter(m => !m.IsDeletedBySender && !m.IsDeletedByReceiver);
         modelBuilder.Entity<Attachment>().HasQueryFilter(a => !a.IsDeleted);
+        modelBuilder.Entity<UserSettings>().HasQueryFilter(us => !us.IsDeleted);
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

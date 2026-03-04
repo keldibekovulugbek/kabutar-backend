@@ -33,4 +33,6 @@ public class User : Auditable
     public virtual ICollection<Message> SentMessages { get; set; } = new HashSet<Message>();
 
     public virtual ICollection<Message> ReceivedMessages { get; set; } = new HashSet<Message>();
+
+    public virtual UserSettings? Settings { get; set; }
 }

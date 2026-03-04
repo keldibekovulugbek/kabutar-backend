@@ -54,7 +54,7 @@ public class AccountService : IAccountService
         var user = (User)dto;
 
         user.PasswordHash = PasswordHasher.Hash(dto.Password);
-        user.ProfilePicture = $"{_fileService.ImageFolderName}/default.jpg";
+        //user.ProfilePicture = $"{_fileService.ImageFolderName}/default.jpg";
         user.Created = TimeHelper.GetCurrentDateTime();
         user.Updated = TimeHelper.GetCurrentDateTime();
 

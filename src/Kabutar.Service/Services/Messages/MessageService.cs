@@ -44,16 +44,13 @@ public class MessageService : IMessageService
             Updated = TimeHelper.GetCurrentDateTime()
         };
 
-        // Save message first to get ID
         await _unitOfWork.Messages.AddAsync(message);
 
-        // Handle attachment if present
         if (dto.Attachment is not null)
         {
             var category = DetectFileCategory(dto.Attachment.FileName);
             var filePath = await _fileService.SaveAsync(dto.Attachment, category);
 
-            // Create attachment record in database
             var attachment = new Attachment
             {
                 MessageId = message.Id,
@@ -67,7 +64,6 @@ public class MessageService : IMessageService
             await _unitOfWork.Attachments.AddAsync(attachment);
         }
 
-        // Real-time notify
         await _notifier.SendMessageToUserAsync(dto.ReceiverId, new
         {
             SenderId = senderId,
@@ -111,7 +107,8 @@ public class MessageService : IMessageService
             LastMessage = res.LastMessage?.Content ?? "",
             Timestamp = res.LastMessage?.Created ?? DateTime.MinValue,
             UnreadCount = res.UnreadCount,
-            IsOnline = res.User.LastActive.HasValue && res.User.LastActive.Value > DateTime.UtcNow.AddMinutes(-5)
+            IsOnline = res.User.LastActive.HasValue && res.User.LastActive.Value > DateTime.UtcNow.AddMinutes(-5),
+            LastActive = res.User.LastActive
         });
     }
     private FileCategory DetectFileCategory(string fileName)
@@ -126,7 +123,7 @@ public class MessageService : IMessageService
             ".mp4" or ".avi" => FileCategory.Video,
             ".mp3" => FileCategory.Music,
             ".wav" => FileCategory.VoiceMessage,
-            _ => FileCategory.Document // default
+            _ => FileCategory.Document
         };
     }
 }

@@ -11,17 +11,20 @@ public class UnitOfWork : IUnitOfWork
     private readonly AppDbContext _context;
 
     public IUserRepository Users { get; }
+    public IUserSettingsRepository UserSettings { get; }
     public IMessageRepository Messages { get; }
     public IAttachmentRepository Attachments { get; }
 
     public UnitOfWork(
         AppDbContext context,
         IUserRepository users,
+        IUserSettingsRepository userSettings,
         IMessageRepository messages,
         IAttachmentRepository attachments)
     {
         _context = context;
         Users = users;
+        UserSettings = userSettings;
         Messages = messages;
         Attachments = attachments;
     }

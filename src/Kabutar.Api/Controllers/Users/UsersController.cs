@@ -68,14 +68,46 @@ public class UsersController : ControllerBase
     }
 
     /// <summary>
-    /// Joriy foydalanuvchini o‘chirish
+    /// Joriy foydalanuvchini o'chirish
     /// </summary>
-    /// 
     [Authorize]
     [HttpDelete]
     public async Task<IActionResult> DeleteAsync()
     {
         var userId = _identity.GetUserId() ?? throw new UnauthorizedAccessException("User not found in token.");
         return Ok(await _userService.DeleteAsync(userId));
+    }
+
+    /// <summary>
+    /// Foydalanuvchi sozlamalarini olish
+    /// </summary>
+    [Authorize]
+    [HttpGet("settings")]
+    public async Task<IActionResult> GetSettingsAsync()
+    {
+        var userId = _identity.GetUserId() ?? throw new UnauthorizedAccessException("User not found in token.");
+        return Ok(await _userService.GetSettingsAsync(userId));
+    }
+
+    /// <summary>
+    /// Foydalanuvchi sozlamalarini yangilash
+    /// </summary>
+    [Authorize]
+    [HttpPut("settings")]
+    public async Task<IActionResult> UpdateSettingsAsync([FromBody] UserSettingsUpdateDTO dto)
+    {
+        var userId = _identity.GetUserId() ?? throw new UnauthorizedAccessException("User not found in token.");
+        return Ok(await _userService.UpdateSettingsAsync(userId, dto));
+    }
+
+    /// <summary>
+    /// Chat orqa fonini yuklash
+    /// </summary>
+    [Authorize]
+    [HttpPost("settings/background")]
+    public async Task<IActionResult> UploadChatBackgroundAsync([FromForm] AccountImageUploadDTO dto)
+    {
+        var userId = _identity.GetUserId() ?? throw new UnauthorizedAccessException("User not found in token.");
+        return Ok(await _userService.UploadChatBackgroundAsync(userId, dto));
     }
 }

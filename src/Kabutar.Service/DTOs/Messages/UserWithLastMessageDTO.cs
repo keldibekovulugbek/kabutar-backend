@@ -19,4 +19,6 @@ public class UserWithLastMessageDTO
     public int UnreadCount { get; set; }
 
     public bool IsOnline { get; set; }
+
+    public DateTime? LastActive { get; set; }
 }

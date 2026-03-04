@@ -29,6 +29,7 @@ namespace Kabutar.Api.Configurations.Dependencies
         {
             // Repositories
             builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IUserSettingsRepository, UserSettingsRepository>();
             builder.Services.AddScoped<IMessageRepository, MessageRepository>();
             builder.Services.AddScoped<IAttachmentRepository, AttachmentRepository>();
 
