@@ -1,4 +1,4 @@
-﻿using Kabutar.DataAccess.Context;
+using Kabutar.DataAccess.Context;
 using Kabutar.DataAccess.Interfaces.Messages;
 using Kabutar.Domain.DTOs.Messages;
 using Kabutar.Domain.Entities.Messages;
@@ -100,6 +100,18 @@ public class MessageRepository : GenericRepository<Message>, IMessageRepository
         await _context.SaveChangesAsync();
     }
 
+    public async Task DeleteMessageForBothAsync(long messageId)
+    {
+        var message = await _dbSet.FindAsync(messageId);
+        if (message is null) return;
+
+        message.IsDeletedBySender = true;
+        message.IsDeletedByReceiver = true;
+        message.Updated = DateTime.UtcNow;
+        _dbSet.Update(message);
+        await _context.SaveChangesAsync();
+    }
+
     public async Task<List<Message>> SearchMessagesAsync(string searchText, long currentUserId, int limit = 20)
     {
         var search = searchText.ToLower().Trim();
@@ -115,5 +127,54 @@ public class MessageRepository : GenericRepository<Message>, IMessageRepository
             .OrderByDescending(m => m.Created)
             .Take(limit)
             .ToListAsync();
+    }
+
+    public async Task<List<Message>> GetAllMessagesForUserAsync(long userId, int limit = 500)
+    {
+        return await _dbSet
+            .Include(m => m.Sender)
+            .Include(m => m.Receiver)
+            .Where(m =>
+                (m.SenderId == userId && !m.IsDeletedBySender) ||
+                (m.ReceiverId == userId && !m.IsDeletedByReceiver))
+            .OrderByDescending(m => m.Created)
+            .Take(limit)
+            .ToListAsync();
+    }
+
+    public async Task ClearChatForUserAsync(long userId, long otherUserId)
+    {
+        var messages = await _dbSet
+            .Where(m =>
+                (m.SenderId == userId && m.ReceiverId == otherUserId) ||
+                (m.SenderId == otherUserId && m.ReceiverId == userId))
+            .ToListAsync();
+
+        foreach (var m in messages)
+        {
+            if (m.SenderId == userId) m.IsDeletedBySender = true;
+            else m.IsDeletedByReceiver = true;
+            m.Updated = DateTime.UtcNow;
+        }
+
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task ClearChatForBothAsync(long userId1, long userId2)
+    {
+        var messages = await _dbSet
+            .Where(m =>
+                (m.SenderId == userId1 && m.ReceiverId == userId2) ||
+                (m.SenderId == userId2 && m.ReceiverId == userId1))
+            .ToListAsync();
+
+        foreach (var m in messages)
+        {
+            m.IsDeletedBySender = true;
+            m.IsDeletedByReceiver = true;
+            m.Updated = DateTime.UtcNow;
+        }
+
+        await _context.SaveChangesAsync();
     }
 }

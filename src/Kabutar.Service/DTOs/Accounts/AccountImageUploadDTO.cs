@@ -1,4 +1,4 @@
-﻿using Kabutar.Domain.Attributes;
+using Kabutar.Domain.Attributes;
 using Microsoft.AspNetCore.Http;
 using System.ComponentModel.DataAnnotations;
 
@@ -10,4 +10,7 @@ public record AccountImageUploadDTO
     [DataType(DataType.Upload)]
     [AllowedFiles(new string[] { ".jpg", ".jpeg", ".png" } )]
     public IFormFile Image { get; set; } = null!;
+
+    [DataType(DataType.Upload)]
+    public IFormFile? Thumbnail { get; set; }
 }

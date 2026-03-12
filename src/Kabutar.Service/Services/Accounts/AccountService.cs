@@ -1,4 +1,4 @@
-﻿using Kabutar.DataAccess.Interfaces;
+using Kabutar.DataAccess.Interfaces;
 using Kabutar.Domain.Entities.Users;
 using Kabutar.Service.DTOs.Accounts;
 using Kabutar.Service.DTOs.Common;
@@ -38,6 +38,8 @@ public class AccountService : IAccountService
     public async Task<string> LogInAsync(LoginDTO dto)
     {
         var user = await GetUserAndValidateCredentialsAsync(dto.UsernameOrEmail, dto.Password);
+        user.LastActive = TimeHelper.GetCurrentDateTime();
+        await _unitOfWork.Users.UpdateAsync(user);
         return _authManager.GenerateToken(user);
     }
 
@@ -54,7 +56,7 @@ public class AccountService : IAccountService
         var user = (User)dto;
 
         user.PasswordHash = PasswordHasher.Hash(dto.Password);
-        //user.ProfilePicture = $"{_fileService.ImageFolderName}/default.jpg";
+
         user.Created = TimeHelper.GetCurrentDateTime();
         user.Updated = TimeHelper.GetCurrentDateTime();
 
@@ -108,11 +110,16 @@ public class AccountService : IAccountService
         var user = await _unitOfWork.Users.GetByEmailAsync(dto.Email)
             ?? throw new StatusCodeException(HttpStatusCode.NotFound, "User not found.");
 
-        if (!user.IsEmailVerified)
-            throw new StatusCodeException(HttpStatusCode.BadRequest, "Email not verified.");
+        if (!_cache.TryGetValue(dto.Email, out int expectedCode))
+            throw new StatusCodeException(HttpStatusCode.BadRequest, "Verification code expired.");
+
+        if (dto.Code != expectedCode)
+            throw new StatusCodeException(HttpStatusCode.BadRequest, "Incorrect verification code.");
 
         user.PasswordHash = PasswordHasher.Hash(dto.Password);
         await _unitOfWork.Users.UpdateAsync(user);
+
+        _cache.Remove(dto.Email);
 
         return true;
     }

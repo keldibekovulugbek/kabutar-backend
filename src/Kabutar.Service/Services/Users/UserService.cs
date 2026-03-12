@@ -1,4 +1,4 @@
-﻿using Kabutar.DataAccess.Interfaces;
+using Kabutar.DataAccess.Interfaces;
 using Kabutar.Domain.Entities.Users;
 using Kabutar.Service.DTOs.Accounts;
 using Kabutar.Service.DTOs.Common;
@@ -62,7 +62,16 @@ public class UserService : IUserService
         if (!string.IsNullOrEmpty(user.ProfilePicture))
             await _fileService.DeleteImageAsync(user.ProfilePicture);
 
+        if (!string.IsNullOrEmpty(user.ProfilePictureThumbnail))
+            await _fileService.DeleteImageAsync(user.ProfilePictureThumbnail);
+
         user.ProfilePicture = await _fileService.SaveImageAsync(dto.Image);
+
+        if (dto.Thumbnail is not null)
+            user.ProfilePictureThumbnail = await _fileService.SaveImageAsync(dto.Thumbnail);
+        else
+            user.ProfilePictureThumbnail = null;
+
         user.Updated = TimeHelper.GetCurrentDateTime();
 
         await _unitOfWork.Users.UpdateAsync(user);
@@ -105,7 +114,7 @@ public class UserService : IUserService
 
         var settings = await _unitOfWork.UserSettings.GetByUserIdAsync(userId);
 
-        // Create default settings if not exists
+
         if (settings == null)
         {
             settings = new UserSettings
@@ -135,7 +144,7 @@ public class UserService : IUserService
 
         var settings = await _unitOfWork.UserSettings.GetByUserIdAsync(userId);
 
-        // Create settings if not exists
+
         if (settings == null)
         {
             settings = new UserSettings
@@ -149,7 +158,7 @@ public class UserService : IUserService
         }
         else
         {
-            // Update only non-null values
+
             if (dto.Theme != null)
                 settings.Theme = dto.Theme;
             if (dto.FontSize != null)
@@ -178,7 +187,7 @@ public class UserService : IUserService
 
         var settings = await _unitOfWork.UserSettings.GetByUserIdAsync(userId);
 
-        // Create settings if not exists
+
         if (settings == null)
         {
             settings = new UserSettings
@@ -189,11 +198,11 @@ public class UserService : IUserService
             };
         }
 
-        // Delete old background if exists
+
         if (!string.IsNullOrEmpty(settings.ChatBackgroundImage))
             await _fileService.DeleteImageAsync(settings.ChatBackgroundImage);
 
-        // Save new background
+
         settings.ChatBackgroundImage = await _fileService.SaveImageAsync(dto.Image);
         settings.Updated = TimeHelper.GetCurrentDateTime();
 

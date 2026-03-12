@@ -1,4 +1,4 @@
-﻿using Kabutar.Domain.Attributes;
+using Kabutar.Domain.Attributes;
 using Kabutar.Domain.Common;
 using Kabutar.Domain.Entities.Messages;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -21,6 +21,8 @@ public class User : Auditable
 
     [AllowedFiles(new[] { ".jpg", ".jpeg", ".png" })]
     public string ProfilePicture { get; set; } = string.Empty;
+
+    public string? ProfilePictureThumbnail { get; set; }
 
     public bool IsEmailVerified { get; set; }
 

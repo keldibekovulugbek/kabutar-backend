@@ -1,5 +1,6 @@
-﻿
 
+
+using Kabutar.Api.Services;
 using Kabutar.DataAccess.Interfaces;
 using Kabutar.DataAccess.Interfaces.Attachments;
 using Kabutar.DataAccess.Interfaces.Messages;
@@ -27,13 +28,13 @@ namespace Kabutar.Api.Configurations.Dependencies
     {
         public static void AddServiceLayer(this WebApplicationBuilder builder)
         {
-            // Repositories
+
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IUserSettingsRepository, UserSettingsRepository>();
             builder.Services.AddScoped<IMessageRepository, MessageRepository>();
             builder.Services.AddScoped<IAttachmentRepository, AttachmentRepository>();
 
-            // Services
+
             builder.Services.AddScoped<IAccountService, AccountService>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IMessageService, MessageService>();
@@ -43,8 +44,10 @@ namespace Kabutar.Api.Configurations.Dependencies
             builder.Services.AddScoped<IEmailService, EmailService>();
             builder.Services.AddScoped<IAuthManager, AuthManager>();
             builder.Services.AddScoped<IIdentityHelperService, IdentityHelperService>();
+            builder.Services.AddSingleton<IEncryptionService, AesEncryptionService>();
+            builder.Services.AddSingleton<IOnlineTracker, OnlineTracker>();
 
-            // Others
+
             builder.Services.AddMemoryCache();
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddSignalR();

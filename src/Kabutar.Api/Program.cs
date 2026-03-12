@@ -10,10 +10,10 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Load .env file
+
 DotNetEnv.Env.Load();
 
-// Override appsettings with environment variables
+
 builder.Configuration["ConnectionStrings:DefaultConnection"] =
     $"Host={Environment.GetEnvironmentVariable("DB_HOST") ?? "localhost"};" +
     $"Port={Environment.GetEnvironmentVariable("DB_PORT") ?? "5432"};" +
@@ -33,7 +33,9 @@ builder.Configuration["Email:Password"] = Environment.GetEnvironmentVariable("EM
 builder.Configuration["Serilog:WriteTo:1:Args:Token"] = Environment.GetEnvironmentVariable("TELEGRAM_BOT_TOKEN");
 builder.Configuration["Serilog:WriteTo:1:Args:ChatId"] = Environment.GetEnvironmentVariable("TELEGRAM_CHAT_ID");
 
-// Configure Serilog
+builder.Configuration["ENCRYPTION_KEY"] = Environment.GetEnvironmentVariable("ENCRYPTION_KEY");
+
+
 builder.ConfigureLogger();
 
 builder.Services.AddControllers();
@@ -44,10 +46,6 @@ builder.AddServiceLayer();
 builder.AddApiLayer();
 
 
-
-
-
-//-> Middlewares
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
@@ -55,37 +53,19 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// Log all incoming requests (DISABLED FOR DEVELOPMENT PERFORMANCE)
-// Uncomment for production monitoring
-/*
-app.Use(async (context, next) =>
-{
-    var requestTime = DateTime.UtcNow;
-
-    await next.Invoke();
-
-    var duration = DateTime.UtcNow - requestTime;
-    var statusCode = context.Response.StatusCode;
-
-    // Only log errors in development
-    if (statusCode >= 500)
-        Log.Error("❌ Server Error: {StatusCode} for {Method} {Path} in {Duration}ms",
-            statusCode, context.Request.Method, context.Request.Path, duration.TotalMilliseconds);
-});
-*/
 
 app.UseStaticFiles();
 app.UseMiddleware<ExceptionHandlerMiddleware>();
 
-// CORS must be before rate limiting
+
 app.UseCors("AllowAll");
 
-// Rate limiting middleware
+
 app.UseIpRateLimiting();
 
 app.MapHub<ChatHub>("/hubs/chat");
-// Disabled for development - WPF uses HTTP
-// app.UseHttpsRedirection();
+
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

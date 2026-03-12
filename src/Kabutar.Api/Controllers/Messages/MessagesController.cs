@@ -1,4 +1,4 @@
-﻿using Kabutar.Service.DTOs.Messages;
+using Kabutar.Service.DTOs.Messages;
 using Kabutar.Service.Interfaces.Common;
 using Kabutar.Service.Interfaces.Messages;
 using Microsoft.AspNetCore.Authorization;
@@ -62,6 +62,20 @@ public class MessageController : ControllerBase
     {
         var myId = _identity.GetUserId() ?? throw new UnauthorizedAccessException("User ID not found in token.");
         var result = await _messageService.GetAllChatUsersAsync(myId);
+        return Ok(result);
+    }
+
+    [HttpDelete("chat/{otherUserId:long}")]
+    public async Task<IActionResult> ClearChatAsync([FromRoute] long otherUserId, [FromQuery] bool clearForBoth = false)
+    {
+        var result = await _messageService.ClearChatAsync(otherUserId, clearForBoth);
+        return Ok(result);
+    }
+
+    [HttpDelete("{messageId:long}")]
+    public async Task<IActionResult> DeleteMessageAsync([FromRoute] long messageId, [FromQuery] bool deleteForBoth = false)
+    {
+        var result = await _messageService.DeleteMessageAsync(messageId, deleteForBoth);
         return Ok(result);
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace Kabutar.Service.DTOs.Messages;
+namespace Kabutar.Service.DTOs.Messages;
 
 public class UserWithLastMessageDTO
 {
@@ -11,6 +11,8 @@ public class UserWithLastMessageDTO
     public string LastName { get; set; } = string.Empty;
 
     public string? ProfilePicture { get; set; }
+
+    public string? ProfilePictureThumbnail { get; set; }
 
     public string LastMessage { get; set; } = string.Empty;
 
