@@ -11,7 +11,7 @@ public class MessageRepository : GenericRepository<Message>, IMessageRepository
 {
     public MessageRepository(AppDbContext context) : base(context) { }
 
-    public async Task<IEnumerable<Message>> GetMessagesBetweenUsersAsync(long userId1, long userId2)
+    public async Task<IEnumerable<Message>> GetMessagesBetweenUsersAsync(long userId1, long userId2, int page = 1, int pageSize = 50)
     {
         return await _dbSet
             .Include(m => m.Attachment)
@@ -19,6 +19,9 @@ public class MessageRepository : GenericRepository<Message>, IMessageRepository
                 (m.SenderId == userId1 && m.ReceiverId == userId2 && !m.IsDeletedBySender) ||
                 (m.SenderId == userId2 && m.ReceiverId == userId1 && !m.IsDeletedByReceiver)
             )
+            .OrderByDescending(m => m.Created)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .OrderBy(m => m.Created)
             .ToListAsync();
     }

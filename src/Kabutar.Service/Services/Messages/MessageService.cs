@@ -8,6 +8,7 @@ using Kabutar.Service.Interfaces.Common;
 using Kabutar.Service.Interfaces.Messages;
 using Kabutar.DataAccess.Interfaces;
 using System.Net;
+using System.Collections.Generic;
 
 namespace Kabutar.Service.Services.Messages;
 
@@ -41,6 +42,15 @@ public class MessageService : IMessageService
         var senderId = _identity.GetUserId()
             ?? throw new StatusCodeException(HttpStatusCode.Unauthorized, "User not authorized");
 
+        bool hasContent = !string.IsNullOrWhiteSpace(dto.Content);
+        bool hasAttachment = dto.Attachment is not null;
+        if (!hasContent && !hasAttachment)
+            throw new StatusCodeException(HttpStatusCode.BadRequest, "Xabar bo'sh bo'lishi mumkin emas.");
+        if (hasContent && dto.Content.Length > 4000)
+            throw new StatusCodeException(HttpStatusCode.BadRequest, "Xabar uzunligi 4000 belgidan oshmasligi kerak.");
+        if (dto.ReceiverId == senderId)
+            throw new StatusCodeException(HttpStatusCode.BadRequest, "O'zingizga xabar yuborib bo'lmaydi.");
+
         var message = new Message
         {
             Content = _encryption.Encrypt(dto.Content),
@@ -55,6 +65,26 @@ public class MessageService : IMessageService
         string? attachmentUrl = null;
         if (dto.Attachment is not null)
         {
+            const long MaxFileSizeBytes = 20 * 1024 * 1024;
+            if (dto.Attachment.Length > MaxFileSizeBytes)
+                throw new StatusCodeException(HttpStatusCode.BadRequest, "Fayl hajmi 20 MB dan oshmasligi kerak.");
+
+            var allowedExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+                { ".jpg", ".jpeg", ".png", ".gif", ".webp", ".pdf", ".doc", ".docx", ".mp4", ".mp3", ".wav" };
+            var ext = Path.GetExtension(dto.Attachment.FileName);
+            if (!allowedExtensions.Contains(ext))
+                throw new StatusCodeException(HttpStatusCode.BadRequest, "Bu fayl turi qo'llab-quvvatlanmaydi.");
+
+            var allowedMimeTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "image/jpeg", "image/png", "image/gif", "image/webp",
+                "application/pdf", "application/msword",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                "video/mp4", "audio/mpeg", "audio/wav"
+            };
+            if (!allowedMimeTypes.Contains(dto.Attachment.ContentType))
+                throw new StatusCodeException(HttpStatusCode.BadRequest, "Fayl turi qo'llab-quvvatlanmaydi.");
+
             var category = DetectFileCategory(dto.Attachment.FileName);
             var filePath = await _fileService.SaveAsync(dto.Attachment, category);
 
@@ -83,9 +113,9 @@ public class MessageService : IMessageService
         return true;
     }
 
-    public async Task<IEnumerable<MessageViewModel>> GetConversationAsync(long userId1, long userId2)
+    public async Task<IEnumerable<MessageViewModel>> GetConversationAsync(long userId1, long userId2, int page = 1, int pageSize = 50)
     {
-        var messages = await _unitOfWork.Messages.GetMessagesBetweenUsersAsync(userId1, userId2);
+        var messages = await _unitOfWork.Messages.GetMessagesBetweenUsersAsync(userId1, userId2, page, pageSize);
         return messages.Select(message =>
         {
             var vm = (MessageViewModel)message;

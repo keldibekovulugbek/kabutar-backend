@@ -16,9 +16,6 @@ public class AttachmentController : ControllerBase
         _attachmentService = attachmentService;
     }
 
-    /// <summary>
-    /// Get an attachment by message ID
-    /// </summary>
     [HttpGet("message/{messageId:long}")]
     public async Task<IActionResult> GetByMessageIdAsync([FromRoute] long messageId)
     {
@@ -26,9 +23,6 @@ public class AttachmentController : ControllerBase
         return Ok(result);
     }
 
-    /// <summary>
-    /// Download attachment file
-    /// </summary>
     [HttpGet("download/{messageId:long}")]
     public async Task<IActionResult> DownloadAsync([FromRoute] long messageId)
     {
@@ -37,7 +31,11 @@ public class AttachmentController : ControllerBase
         if (attachment == null)
             return NotFound(new { message = "Attachment not found" });
 
-        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", attachment.FilePath.TrimStart('/'));
+        var wwwrootBase = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"));
+        var filePath = Path.GetFullPath(Path.Combine(wwwrootBase, attachment.FilePath.TrimStart('/', '\\')));
+
+        if (!filePath.StartsWith(wwwrootBase, StringComparison.OrdinalIgnoreCase))
+            return BadRequest(new { message = "Invalid file path." });
 
         if (!System.IO.File.Exists(filePath))
             return NotFound(new { message = "File not found on server" });
@@ -48,9 +46,6 @@ public class AttachmentController : ControllerBase
         return File(fileBytes, attachment.MimeType, fileName);
     }
 
-    /// <summary>
-    /// Delete an attachment by message ID
-    /// </summary>
     [HttpDelete("message/{messageId:long}")]
     public async Task<IActionResult> DeleteByMessageIdAsync([FromRoute] long messageId)
     {

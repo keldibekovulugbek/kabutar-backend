@@ -6,7 +6,7 @@ public interface IMessageRepository : IGenericRepository<Message>
 {
 
 
-    Task<IEnumerable<Message>> GetMessagesBetweenUsersAsync(long userId1, long userId2);
+    Task<IEnumerable<Message>> GetMessagesBetweenUsersAsync(long userId1, long userId2, int page = 1, int pageSize = 50);
 
 
     Task<IEnumerable<Message>> GetUnreadMessagesForUserAsync(long userId);

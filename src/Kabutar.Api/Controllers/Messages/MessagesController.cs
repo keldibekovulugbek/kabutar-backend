@@ -35,10 +35,15 @@ public class MessageController : ControllerBase
     }
 
     [HttpGet("conversation/{userId:long}")]
-    public async Task<IActionResult> GetConversationAsync([FromRoute] long userId)
+    public async Task<IActionResult> GetConversationAsync(
+        [FromRoute] long userId,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 50)
     {
+        if (page < 1) page = 1;
+        if (pageSize < 1 || pageSize > 100) pageSize = 50;
         var myId = _identity.GetUserId() ?? throw new UnauthorizedAccessException("User ID not found in token.");
-        var messages = await _messageService.GetConversationAsync(myId, userId);
+        var messages = await _messageService.GetConversationAsync(myId, userId, page, pageSize);
         return Ok(messages);
     }
 

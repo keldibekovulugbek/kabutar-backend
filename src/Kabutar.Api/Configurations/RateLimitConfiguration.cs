@@ -6,38 +6,32 @@ namespace Kabutar.Api.Configurations
     {
         public static void ConfigureRateLimiting(this IServiceCollection services)
         {
-            // Rate limit configuration
             services.AddMemoryCache();
 
             services.Configure<IpRateLimitOptions>(options =>
             {
-                // General rules for all endpoints
                 options.GeneralRules = new List<RateLimitRule>
                 {
                     new RateLimitRule
                     {
                         Endpoint = "*",
                         Period = "1m",
-                        Limit = 60 // 60 requests per minute per IP
+                        Limit = 60
                     },
                     new RateLimitRule
                     {
                         Endpoint = "*",
                         Period = "1h",
-                        Limit = 1000 // 1000 requests per hour per IP
+                        Limit = 1000
                     }
                 };
 
-                // Specific rules for sensitive endpoints
                 options.EndpointWhitelist = new List<string>();
 
-                // Rate limit counter prefix
                 options.RateLimitCounterPrefix = "kabutar_rl";
 
-                // HTTP status code returned when rate limit is exceeded
                 options.HttpStatusCode = 429;
 
-                // Message when rate limit exceeded
                 options.QuotaExceededMessage = "Too many requests. Please try again later.";
             });
 
@@ -45,7 +39,6 @@ namespace Kabutar.Api.Configurations
             {
                 options.IpRules = new List<IpRateLimitPolicy>
                 {
-                    // Stricter limits for auth endpoints
                     new IpRateLimitPolicy
                     {
                         Ip = "*",
@@ -55,25 +48,43 @@ namespace Kabutar.Api.Configurations
                             {
                                 Endpoint = "POST:/api/account/login",
                                 Period = "1m",
-                                Limit = 5 // Only 5 login attempts per minute
+                                Limit = 5
                             },
                             new RateLimitRule
                             {
                                 Endpoint = "POST:/api/account/register",
                                 Period = "1m",
-                                Limit = 3 // 3 registration attempts per minute
+                                Limit = 3
                             },
                             new RateLimitRule
                             {
                                 Endpoint = "POST:/api/account/send-code",
                                 Period = "1m",
-                                Limit = 2 // 2 code requests per minute
+                                Limit = 2
                             },
                             new RateLimitRule
                             {
                                 Endpoint = "POST:/api/account/reset-password",
                                 Period = "5m",
-                                Limit = 3 // 3 password resets per 5 minutes
+                                Limit = 3
+                            },
+                            new RateLimitRule
+                            {
+                                Endpoint = "POST:/api/messages",
+                                Period = "1m",
+                                Limit = 60
+                            },
+                            new RateLimitRule
+                            {
+                                Endpoint = "POST:/api/messages/text",
+                                Period = "1m",
+                                Limit = 60
+                            },
+                            new RateLimitRule
+                            {
+                                Endpoint = "DELETE:/api/messages",
+                                Period = "1m",
+                                Limit = 30
                             }
                         }
                     }
