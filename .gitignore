@@ -84,3 +84,14 @@ AppDbContextModelSnapshot.cs
 
 # Claude Code
 .claude/
+
+# Images
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+*.webp
+*.svg
+*.ico
+wwwroot/images/
